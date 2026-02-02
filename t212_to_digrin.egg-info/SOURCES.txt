@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+t212_to_digrin.egg-info/PKG-INFO
+t212_to_digrin.egg-info/SOURCES.txt
+t212_to_digrin.egg-info/dependency_links.txt
+t212_to_digrin.egg-info/requires.txt
+t212_to_digrin.egg-info/top_level.txt

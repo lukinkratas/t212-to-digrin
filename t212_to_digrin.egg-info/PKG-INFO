@@ -1,3 +1,14 @@
+Metadata-Version: 2.4
+Name: t212-to-digrin
+Version: 0.1.0
+Summary: Python CLI tool for fetching T212 reports via API call and transforming them to be used in Digrin portfolio tracker. Stores the reports in AWS S3.
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: boto3>=1.37.18
+Requires-Dist: pandas>=2.2.3
+Requires-Dist: python-dotenv>=1.0.1
+Requires-Dist: requests>=2.32.3
+
 
 Python CLI tool for fetching T212 reports via API call and transforming them to be used in Digrin portfolio tracker. Stores the reports in AWS S3.
 
