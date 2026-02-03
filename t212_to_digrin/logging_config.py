@@ -16,11 +16,11 @@ def configure_logging() -> None:
                 "class": "logging.Formatter",
                 "datefmt": "%Y-%m-%dT%H:%M:%SZ",
                 "format": (
-                    "%(asctime)s | "
-                    "%(levelname)-8s | "
-                    "%(name)s | "
-                    "%(filename)s:%(lineno)d | "
-                    "%(funcName)s | "
+                    "%(asctime)s|"
+                    "%(levelname)-8s|"
+                    "%(name)-20s|"
+                    "%(filename)-8s:%(lineno)-3d|"
+                    "%(funcName)s: "
                     "%(message)s"
                 ),
             },
