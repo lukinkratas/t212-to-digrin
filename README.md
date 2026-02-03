@@ -29,3 +29,4 @@ Can be run from CLI or AWS lambda.
 - [ ] add unit tests with mocking
 - [ ] format and lint
 - [x] why is not get_input_dt logger? -> NOPE
+- [ ] warning / err log record formatting
