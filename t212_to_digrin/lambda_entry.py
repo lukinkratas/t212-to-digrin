@@ -1,3 +1,4 @@
+from typing import Any
 import json
 import logging
 from datetime import date
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 configure_logging()
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """Logic for lambda entrypoint."""
     print(event)
     print(context)
