@@ -4,44 +4,39 @@ from logging.config import dictConfig
 def configure_logging() -> None:
     """Configure logging."""
     cfg = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'simple': {
-                'class': 'logging.Formatter',
-                'datefmt': '%Y-%m-%dT%H:%M:%SZ',
-                'format': (
-                    '%(asctime)s | '
-                    '%(levelname)-8s | '
-                    '%(name)s | '
-                    '%(message)s'
-                ),
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "simple": {
+                "class": "logging.Formatter",
+                "datefmt": "%Y-%m-%dT%H:%M:%SZ",
+                "format": ("%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"),
             },
-            'detailed': {
-                'class': 'logging.Formatter',
-                'datefmt': '%Y-%m-%dT%H:%M:%SZ',
-                'format': (
-                    '%(asctime)s | '
-                    '%(levelname)-8s | '
-                    '%(name)s | '
-                    '%(filename)s:%(lineno)d | '
-                    '%(funcName)s | '
-                    '%(message)s'
+            "detailed": {
+                "class": "logging.Formatter",
+                "datefmt": "%Y-%m-%dT%H:%M:%SZ",
+                "format": (
+                    "%(asctime)s | "
+                    "%(levelname)-8s | "
+                    "%(name)s | "
+                    "%(filename)s:%(lineno)d | "
+                    "%(funcName)s | "
+                    "%(message)s"
                 ),
             },
         },
-        'handlers': {
-            'stdout': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'detailed',
-                'level': 'DEBUG',
+        "handlers": {
+            "stdout": {
+                "class": "logging.StreamHandler",
+                "formatter": "detailed",
+                "level": "DEBUG",
             },
         },
-        'loggers': {
-            't212_to_digrin': {
-                'handlers': ['stdout'],
-                'level': 'DEBUG',
-                'propagate': False,
+        "loggers": {
+            "t212_to_digrin": {
+                "handlers": ["stdout"],
+                "level": "DEBUG",
+                "propagate": False,
             },
         },
     }
