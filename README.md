@@ -27,8 +27,9 @@ Can be run from CLI or AWS lambda.
 
 # TODO
 - [ ] add unit tests with mocking
-- [ ] format and lint
+- [x] format and lint
+- [ ] typechk
 - [x] why is not get_input_dt logger? -> NOPE
-- [ ] warning / err log record formatting
+- [x] warning / err log record formatting
 - [ ] AWS tags, resource group, application (after terraform)
-- [ ] presigned url only in CLI, lambda not
+- [x] presigned url only in CLI, lambda not
