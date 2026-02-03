@@ -26,7 +26,7 @@ def configure_logging() -> None:
             },
         },
         "handlers": {
-            "stdout": {
+            "stream_handler": {
                 "class": "logging.StreamHandler",
                 "formatter": "detailed",
                 "level": "DEBUG",
@@ -34,7 +34,7 @@ def configure_logging() -> None:
         },
         "loggers": {
             "t212_to_digrin": {
-                "handlers": ["stdout"],
+                "handlers": ["stream_handler"],
                 "level": "DEBUG",
                 "propagate": False,
             },
