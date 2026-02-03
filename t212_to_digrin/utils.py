@@ -7,19 +7,20 @@ import pandas as pd
 
 
 def decode_to_df(encoded_df: bytes, **kwargs: Any) -> pd.DataFrame:
-    return pd.read_csv(StringIO(encoded_df.decode('utf-8')), **kwargs)
+    """Decode bytes to Pandas Dataframe."""
+    return pd.read_csv(StringIO(encoded_df.decode("utf-8")), **kwargs)
 
 
 def encode_df(decoded_df: pd.DataFrame, **kwargs: Any) -> bytes:
-    index = kwargs.pop('index', False)
+    """Encode Pandas Dataframe to bytes."""
+    index = kwargs.pop("index", False)
     bytes = BytesIO()
     decoded_df.to_csv(bytes, index=index, **kwargs)
     bytes.seek(0)
     return bytes.getvalue()
 
-def get_func_name(
-    func: Callable[..., Any], args: tuple[Any, ...]
-) -> str:
+
+def get_func_name(func: Callable[..., Any], args: tuple[Any, ...]) -> str:
     """Helper function for function name logging.
 
     Args:
@@ -30,8 +31,7 @@ def get_func_name(
     """
     # check if first argument is class instance (self)
     if args and hasattr(args[0], func.__name__):
-        func_name = f'{args[0].__class__.__name__}.{func.__name__}'
-        return func_name
+        return f"{args[0].__class__.__name__}.{func.__name__}"
 
     return func.__name__
 
@@ -46,9 +46,9 @@ def log_func(log_func: Callable[..., Any] = print) -> Callable[..., Any]:
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             func_name = get_func_name(func, args)
 
-            log_func(f'{func_name}() was called.')
+            log_func(f"{func_name}() was called.")
             result = func(*args, **kwargs)
-            log_func(f'{func_name} finished successfully.')
+            log_func(f"{func_name} finished successfully.")
 
             return result
 

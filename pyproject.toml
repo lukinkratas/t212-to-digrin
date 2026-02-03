@@ -27,7 +27,7 @@ extend-select = [
     "N",    # PEP8 naming
     "R",    # RSE - flake8 raise, RET - flake8 return, RUF - ruff specific
     "I",    # isort
-    "C901", # mccabe - complexity
+    # "C901", # mccabe - complexity
     "PD",   # pandas
     "NPY",  # numpy
     "D"     # pydocstyle

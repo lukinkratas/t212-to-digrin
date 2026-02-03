@@ -8,9 +8,11 @@ from .utils import log_func
 
 logger = logging.getLogger(__name__)
 
-class Client(object):
 
-    BASE_URL = 'https://live.trading212.com/api/v0'
+class Client(object):
+    """Client for Trading 212 API."""
+
+    BASE_URL = "https://live.trading212.com/api/v0"
 
     def __init__(self, api_key_id: str, secret_key: str):
         self.api_key_id = api_key_id
@@ -26,19 +28,19 @@ class Client(object):
         include_orders: bool = True,
         include_transactions: bool = True,
     ) -> int | None:
-        """Spawns T212 csv export process."""
-        url = f'{self.BASE_URL}/history/exports'
+        """Spawn T212 csv export process."""
+        url = f"{self.BASE_URL}/history/exports"
         payload = {
-            'dataIncluded': {
-                'includeDividends': include_dividends,
-                'includeInterest': include_interest,
-                'includeOrders': include_orders,
-                'includeTransactions': include_transactions,
+            "dataIncluded": {
+                "includeDividends": include_dividends,
+                "includeInterest": include_interest,
+                "includeOrders": include_orders,
+                "includeTransactions": include_transactions,
             },
-            'timeFrom': from_dt,
-            'timeTo': to_dt,
+            "timeFrom": from_dt,
+            "timeTo": to_dt,
         }
-        headers = {'Content-Type': 'application/json'}
+        headers = {"Content-Type": "application/json"}
         auth = (self.api_key_id, self.secret_key)
 
         try:
@@ -49,12 +51,12 @@ class Client(object):
             logging.error(e)
             raise e
 
-        return response.json().get('reportId')
+        return response.json().get("reportId")
 
     @log_func(logger.debug)
     def list_exports(self) -> list[dict[str, Any]] | None:
-        """Fetches list of reports."""
-        url = f'{self.BASE_URL}/history/exports'
+        """Fetch list of reports."""
+        url = f"{self.BASE_URL}/history/exports"
         auth = (self.api_key_id, self.secret_key)
 
         try:
