@@ -15,7 +15,7 @@ Can be run from CLI or AWS lambda.
 ### Setup
 
 **Requirements**:
-- T212 api key (only metadata + all history perms)
+- T212 api key (only all history perms)
 - T212 api key in AWS Secrets Manager.
 - configure AWS CLI via `aws configure` (or use .env)
 
@@ -30,3 +30,5 @@ Can be run from CLI or AWS lambda.
 - [ ] format and lint
 - [x] why is not get_input_dt logger? -> NOPE
 - [ ] warning / err log record formatting
+- [ ] AWS tags, resource group, application (after terraform)
+- [ ] presigned url only in CLI, lambda not
