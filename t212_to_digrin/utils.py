@@ -1,10 +1,5 @@
-import getpass
-import logging
-import statistics
 from collections.abc import Callable
-from datetime import timedelta
 from functools import wraps
-from time import perf_counter
 from typing import Any
 
 from functools import wraps
@@ -26,9 +21,9 @@ def encode_df(decoded_df: pd.DataFrame, **kwargs: Any) -> bytes:
     bytes.seek(0)
     return bytes.getvalue()
 
-def get_func_name_and_args(
+def get_func_name(
     func: Callable[..., Any], args: tuple[Any, ...]
-) -> tuple[str, tuple[Any, ...]]:
+) -> str:
     """Helper function for function name logging.
 
     Args:
@@ -40,9 +35,9 @@ def get_func_name_and_args(
     # check if first argument is class instance (self)
     if args and hasattr(args[0], func.__name__):
         func_name = f'{args[0].__class__.__name__}.{func.__name__}'
-        return func_name, args[1:]
+        return func_name
 
-    return func.__name__, args
+    return func.__name__
 
 
 def log_func(log_func: Callable[..., Any] = print) -> Callable[..., Any]:
@@ -53,11 +48,11 @@ def log_func(log_func: Callable[..., Any] = print) -> Callable[..., Any]:
 
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            func_name, args_copy = get_func_name_and_args(func, args)
+            func_name = get_func_name(func, args)
 
-            log_func(f'{func_name} was called with args={args_copy}, {kwargs=}.')
+            log_func(f'{func_name}() was called.')
             result = func(*args, **kwargs)
-            log_func(f'{func_name} finished successfully with {result=}.')
+            log_func(f'{func_name} finished successfully.')
 
             return result
 

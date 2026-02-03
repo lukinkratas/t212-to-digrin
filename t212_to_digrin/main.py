@@ -4,41 +4,26 @@ from datetime import date, datetime
 from io import BytesIO
 from typing import Any
 import pandas as pd
-import json
 import logging
 import requests
+from requests.exceptions import HTTPError
 
 import boto3
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
 
 from .t212 import Client as T212Client
-from .logging_config import configure_logging
 from .utils import log_func, decode_to_df, encode_df
 
 
 logger = logging.getLogger(__name__)
-configure_logging()
 
 load_dotenv(override=True)
 
 s3 = boto3.client('s3')
 BUCKET_NAME = os.environ['BUCKET_NAME']
 t212 = T212Client(key=os.environ['T212_API_KEY'])
-
-
-@log_func(logger.info)
-def get_input_dt() -> date:
-    prev_month: date = date.today() - relativedelta(months=1)  # day does not matter
-
-    print('Reporting Year Month in "YYYY-mm" format:')
-    print(f'Or confirm default "{prev_month.strftime("%Y-%m")}" by ENTER.')
-    input_dt = input()
-
-    if input_dt is None:
-        return prev_month
-
-    return datetime.strptime(input_dt, '%Y-%m')
+NRETRIES = 3
 
 @log_func(logger.info)
 def create_report(from_dt: str | date | datetime, to_dt: str | date | datetime) -> dict[str, Any]:
@@ -49,26 +34,42 @@ def create_report(from_dt: str | date | datetime, to_dt: str | date | datetime) 
     if isinstance(to_dt, (date, datetime)):
         to_dt = to_dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    while True:
-        report_id = t212.create_report(from_dt, to_dt)
+    msg = 'POST export attempt no. {idx}/{total} {status}.'
 
-        if report_id is None:
-            logger.debug('No report export returned.)')
+    for idx in range(1, NRETRIES+1):
+
+        logger.debug(msg.format(idx=idx, total=NRETRIES, status='started'))
+
+        try:
+            report_id = t212.create_report(from_dt, to_dt)
+
+        except HTTPError:
+            logger.warning(msg.format(idx=idx, total=NRETRIES, status='failed') + 'Waiting 15s...')
             time.sleep(15) # limit 1 call per 30s
             continue
 
+        logger.debug(msg.format(idx=idx, total=NRETRIES, status='succeeded'))
+        break
+
     # optimized wait time for report creation
-    time.sleep(1)
+    logger.debug(f'Waiting 10s between API calls...')
+    time.sleep(10)
 
-    while True:
-        # reports: list of dicts with keys:
-        #   reportId, timeFrom, timeTo, dataIncluded, status, downloadLink
-        reports: list[dict[str, Any]] = t212.list_reports()
+    msg = 'GET history exports attempt no. {idx}/{total} {status}.'
 
-        if reports is None:
-            logger.debug('No reports list returned.')
+    for idx in range(1, NRETRIES+1):
+
+        logger.debug(msg.format(idx=idx, total=NRETRIES, status='started'))
+
+        try:
+            reports = t212.list_reports()
+
+        except HTTPError:
+            logger.warning(msg.format(idx=idx, total=NRETRIES, status='failed') + 'Waiting 30s ...')
             time.sleep(30) # limit 1 call per 1min
             continue
+
+        logger.debug(msg.format(idx=idx, total=NRETRIES, status='succeeded'))
 
         # filter report by report_id
         filtered_reports = [r for r in reports if r['reportId'] == report_id]
@@ -81,12 +82,12 @@ def create_report(from_dt: str | date | datetime, to_dt: str | date | datetime) 
         # created report found
         report = filtered_reports[0]
 
-        if report.get('status') == 'Finished':
-            logger.debug('Report finished.')
-            break
+        if report.get('status') != 'Finished':
+            logger.debug('Created report not yet finished.')
+            time.sleep(30)
+            continue
 
-        logger.debug('Report not yet ready.')
-        time.sleep(30)
+        break
 
     return report
 
@@ -132,20 +133,22 @@ def download_report(url: str) -> bytes:
     response.raise_for_status()
     return response.content
 
-def main(input_dt: date) -> None:
+@log_func(logger.info)
+def run(input_dt: date) -> None:
     from_dt = input_dt.replace(day=1)
     to_dt = from_dt + relativedelta(months=1)
 
     report = create_report(from_dt, to_dt)
+    download_link = report["downloadLink"]
 
-    t212_df_encoded = download_report(report['download_link'])
+    t212_df_encoded = download_report(report['downloadLink'])
 
     filename: str = f'{input_dt.strftime("%Y-%m")}.csv'
 
     s3.upload_fileobj(
         Fileobj=BytesIO(t212_df_encoded), Bucket=BUCKET_NAME, Key=f't212/{filename}'
     )
-    logger.debug('T212 CSV uploaded.')
+    logger.debug('T212 CSV downloaded and uploaded to S3.')
 
     t212_df: pd.DataFrame = decode_to_df(t212_df_encoded)
 
@@ -155,17 +158,11 @@ def main(input_dt: date) -> None:
     s3.upload_fileobj(
         Fileobj=BytesIO(digrin_df_encoded), Bucket=BUCKET_NAME, Key=f'digrin/{filename}'
     )
+    logger.debug('Digrin CSV transformed and uploaded to S3.')
 
-def lambda_handler(event, context):
-    print(event)
-    print(context)
-
-    prev_month: date = date.today() - relativedelta(months=1)  # day does not matter
-    main(prev_month)
-
-    return {'statusCode': 200, 'body': json.dumps('Success!')}
-
-
-if __name__ == '__main__':
-    input_dt = get_input_dt()  # used later in the naming of csv
-    main(input_dt)
+    digrin_csv_url = s3.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': BUCKET_NAME, 'Key': f'digrin/{filename}'},
+        ExpiresIn=120, # 2min
+    )
+    logger.info(f'Digrin CSV url: {digrin_csv_url}')

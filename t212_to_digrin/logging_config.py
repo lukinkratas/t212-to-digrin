@@ -16,7 +16,7 @@ def configure_logging() -> None:
                     '%(asctime)s | '
                     '%(levelname)-8s | '
                     '%(name)s | '
-                    '[%(correlation_id)s] %(message)s'
+                    '%(message)s'
                 ),
             },
             'detailed': {
@@ -28,20 +28,19 @@ def configure_logging() -> None:
                     '%(name)s | '
                     '%(filename)s:%(lineno)d | '
                     '%(funcName)s | '
-                    '[%(correlation_id)s] %(message)s'
+                    '%(message)s'
                 ),
             },
         },
         'handlers': {
             'stdout': {
                 'class': 'logging.StreamHandler',
-                'formatter': 'simple',
+                'formatter': 'detailed',
                 'level': 'DEBUG',
-                'filters': ['correlation_id', 'mask_email'],
             },
         },
         'loggers': {
-            'api': {
+            't212_to_digrin': {
                 'handlers': ['stdout'],
                 'level': 'DEBUG',
                 'propagate': False,
