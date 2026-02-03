@@ -143,7 +143,7 @@ def download_report(url: str) -> bytes:
 
 
 @log_func(logger.info)
-def run(input_dt: date) -> None:
+def run(input_dt: date, generate_download_url: bool = False) -> None:
     """Common runner logic shared between CLI and lambda entrypoints."""
     from_dt = input_dt.replace(day=1)
     to_dt = from_dt + relativedelta(months=1)
@@ -171,5 +171,6 @@ def run(input_dt: date) -> None:
     )
     logger.debug("Digrin CSV transformed and uploaded to S3.")
 
-    digrin_csv_url = get_download_url(bucket=BUCKET_NAME, key=f"digrin/{filename}")
-    logger.info(f"Digrin CSV url: {digrin_csv_url}")
+    if generate_download_url:
+        digrin_csv_url = get_download_url(bucket=BUCKET_NAME, key=f"digrin/{filename}")
+        logger.info(f"Digrin CSV url: {digrin_csv_url}")

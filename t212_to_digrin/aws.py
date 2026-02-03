@@ -45,5 +45,5 @@ def get_download_url(bucket: str, key: str) -> str:
         s3.generate_presigned_url,
         "get_object",
         Params={"Bucket": bucket, "Key": key},
-        ExpiresIn=120,  # 2min
+        ExpiresIn=60,  # 1min
     )
