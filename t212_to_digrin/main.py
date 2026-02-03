@@ -16,7 +16,7 @@ from .utils import decode_to_df, encode_df, log_func
 logger = logging.getLogger(__name__)
 
 BUCKET_NAME = "t212-to-digrin"
-NRETRIES = 3
+NRETRIES = 5
 
 
 @log_func(logger.info)
@@ -43,9 +43,8 @@ def create_report(
         report_id = t212.export_report(from_dt, to_dt)
 
         if report_id is None:
-            logger.warning(
-                msg.format(idx=idx, total=NRETRIES, status="failed") + "Waiting 15s..."
-            )
+            logger.warning(msg.format(idx=idx, total=NRETRIES, status="failed"))
+            logger.debug("Waiting 15s...")
             time.sleep(15)  # limit 1 call per 30s
             continue
 
@@ -55,7 +54,7 @@ def create_report(
     if report_id is None:
         sys.exit(1)
 
-    # optimized wait time for report creation
+    # optimized wait time for report to be created
     logger.debug("Waiting 10s between API calls...")
     time.sleep(10)
 
@@ -65,9 +64,8 @@ def create_report(
         reports = t212.list_exports()
 
         if reports is None:
-            logger.warning(
-                msg.format(idx=idx, total=NRETRIES, status="failed") + "Waiting 30s ..."
-            )
+            logger.warning(msg.format(idx=idx, total=NRETRIES, status="failed"))
+            logger.debug("Waiting 30s ...")
             time.sleep(30)  # limit 1 call per 1min
             continue
 
@@ -78,6 +76,7 @@ def create_report(
 
         if filtered_reports == []:
             logger.debug("Created report not found in reports list.")
+            logger.debug("Waiting 30s ...")
             time.sleep(30)  # limit 1 call per 1min
             continue
 
@@ -86,6 +85,7 @@ def create_report(
 
         if report.get("status") != "Finished":
             logger.debug("Created report not yet finished.")
+            logger.debug("Waiting 30s ...")
             time.sleep(30)
             continue
 
