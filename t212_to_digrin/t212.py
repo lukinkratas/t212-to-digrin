@@ -48,8 +48,8 @@ class Client(object):
             response.raise_for_status()
 
         except HTTPError as e:
-            logging.error(e)
-            raise e
+            logging.warning(e)
+            return None
 
         return response.json().get("reportId")
 
@@ -64,7 +64,7 @@ class Client(object):
             response.raise_for_status()
 
         except HTTPError as e:
-            logging.error(e)
-            raise e
+            logging.warning(e)
+            return None
 
         return response.json()
