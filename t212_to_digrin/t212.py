@@ -1,20 +1,23 @@
-import datetime
+import logging
 from typing import Any
 
 import requests
+from requests.exceptions import HTTPError
 
 from .utils import log_func
-
-import logging
 
 logger = logging.getLogger(__name__)
 
 class Client(object):
-    def __init__(self, key: str):
-        self.key = key
+
+    BASE_URL = 'https://live.trading212.com/api/v0'
+
+    def __init__(self, api_key_id: str, secret_key: str):
+        self.api_key_id = api_key_id
+        self.secret_key = secret_key
 
     @log_func(logger.debug)
-    def create_report(
+    def export_report(
         self,
         from_dt: str,
         to_dt: str,
@@ -24,7 +27,7 @@ class Client(object):
         include_transactions: bool = True,
     ) -> int | None:
         """Spawns T212 csv export process."""
-        url = 'https://live.trading212.com/api/v0/history/exports'
+        url = f'{self.BASE_URL}/history/exports'
         payload = {
             'dataIncluded': {
                 'includeDividends': include_dividends,
@@ -35,21 +38,31 @@ class Client(object):
             'timeFrom': from_dt,
             'timeTo': to_dt,
         }
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': self.key,
-        }
+        headers = {'Content-Type': 'application/json'}
+        auth = (self.api_key_id, self.secret_key)
 
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()
+        try:
+            response = requests.post(url, json=payload, headers=headers, auth=auth)
+            response.raise_for_status()
+
+        except HTTPError as e:
+            logging.error(e)
+            raise e
+
         return response.json().get('reportId')
 
     @log_func(logger.debug)
-    def list_reports(self) -> list[dict[str, Any]] | None:
+    def list_exports(self) -> list[dict[str, Any]] | None:
         """Fetches list of reports."""
-        url = 'https://live.trading212.com/api/v0/history/exports'
-        headers = {'Authorization': self.key}
+        url = f'{self.BASE_URL}/history/exports'
+        auth = (self.api_key_id, self.secret_key)
 
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
+        try:
+            response = requests.get(url, auth=auth)
+            response.raise_for_status()
+
+        except HTTPError as e:
+            logging.error(e)
+            raise e
+
         return response.json()

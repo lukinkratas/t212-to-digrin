@@ -14,13 +14,11 @@ Can be run from CLI or AWS lambda.
 
 ### Setup
 
-```bash
-    echo "AWS_ACCESS_KEY_ID=xxx" >> .env # or use aws configure
-    echo "AWS_SECRET_ACCESS_KEY=xxx" >> .env # or use aws configure
-    echo "AWS_REGION=xxx" >> .env # or use aws configure
-    echo "BUCKET_NAME=xxx" >> .env
-    echo "T212_API_KEY=xxx" > .env
-```
+**Requirements**:
+- T212 api key (only metadata + all history perms)
+- T212 api key in AWS Secrets Manager.
+- configure AWS CLI via `aws configure` (or use .env)
+
 ### Run
 
 ```bash

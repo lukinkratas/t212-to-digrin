@@ -1,28 +1,25 @@
+import sys
+from io import BytesIO
+import logging
 import os
 import time
 from datetime import date, datetime
-from io import BytesIO
 from typing import Any
-import pandas as pd
-import logging
-import requests
-from requests.exceptions import HTTPError
 
-import boto3
+import pandas as pd
+import requests
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
+from requests.exceptions import HTTPError
 
 from .t212 import Client as T212Client
-from .utils import log_func, decode_to_df, encode_df
-
+from .utils import decode_to_df, encode_df, log_func
+from .aws import upload_file, get_secret, get_download_url
 
 logger = logging.getLogger(__name__)
-
 load_dotenv(override=True)
 
-s3 = boto3.client('s3')
-BUCKET_NAME = os.environ['BUCKET_NAME']
-t212 = T212Client(key=os.environ['T212_API_KEY'])
+BUCKET_NAME = 't212-to-digrin'
 NRETRIES = 3
 
 @log_func(logger.info)
@@ -34,16 +31,21 @@ def create_report(from_dt: str | date | datetime, to_dt: str | date | datetime) 
     if isinstance(to_dt, (date, datetime)):
         to_dt = to_dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    msg = 'POST export attempt no. {idx}/{total} {status}.'
+    t212_secret = get_secret('t212')
+    t212 = T212Client(
+        api_key_id=t212_secret['API_KEY_ID'],
+        secret_key=t212_secret['SECRET_KEY'],
+    )
+
+    msg = 'Attempt no. {idx}/{total} {status}.'
 
     for idx in range(1, NRETRIES+1):
 
         logger.debug(msg.format(idx=idx, total=NRETRIES, status='started'))
 
-        try:
-            report_id = t212.create_report(from_dt, to_dt)
+        report_id = t212.export_report(from_dt, to_dt)
 
-        except HTTPError:
+        if report_id is None:
             logger.warning(msg.format(idx=idx, total=NRETRIES, status='failed') + 'Waiting 15s...')
             time.sleep(15) # limit 1 call per 30s
             continue
@@ -51,20 +53,20 @@ def create_report(from_dt: str | date | datetime, to_dt: str | date | datetime) 
         logger.debug(msg.format(idx=idx, total=NRETRIES, status='succeeded'))
         break
 
-    # optimized wait time for report creation
-    logger.debug(f'Waiting 10s between API calls...')
-    time.sleep(10)
+    if report_id is None:
+        sys.exit(1)
 
-    msg = 'GET history exports attempt no. {idx}/{total} {status}.'
+    # optimized wait time for report creation
+    logger.debug('Waiting 10s between API calls...')
+    time.sleep(10)
 
     for idx in range(1, NRETRIES+1):
 
         logger.debug(msg.format(idx=idx, total=NRETRIES, status='started'))
 
-        try:
-            reports = t212.list_reports()
+        reports = t212.list_exports()
 
-        except HTTPError:
+        if reports is None:
             logger.warning(msg.format(idx=idx, total=NRETRIES, status='failed') + 'Waiting 30s ...')
             time.sleep(30) # limit 1 call per 1min
             continue
@@ -74,7 +76,7 @@ def create_report(from_dt: str | date | datetime, to_dt: str | date | datetime) 
         # filter report by report_id
         filtered_reports = [r for r in reports if r['reportId'] == report_id]
 
-        if filtered_reports is []:
+        if filtered_reports == []:
             logger.debug('Created report not found in reports list.')
             time.sleep(30) # limit 1 call per 1min
             continue
@@ -88,6 +90,9 @@ def create_report(from_dt: str | date | datetime, to_dt: str | date | datetime) 
             continue
 
         break
+
+    if reports is None or filtered_reports == [] or report is None:
+        sys.exit(1)
 
     return report
 
@@ -140,13 +145,14 @@ def run(input_dt: date) -> None:
 
     report = create_report(from_dt, to_dt)
     download_link = report["downloadLink"]
-
-    t212_df_encoded = download_report(report['downloadLink'])
+    t212_df_encoded = download_report(download_link)
 
     filename: str = f'{input_dt.strftime("%Y-%m")}.csv'
 
-    s3.upload_fileobj(
-        Fileobj=BytesIO(t212_df_encoded), Bucket=BUCKET_NAME, Key=f't212/{filename}'
+    upload_file(
+        fileobj=BytesIO(t212_df_encoded),
+        bucket=BUCKET_NAME,
+        key=f't212/{filename}',
     )
     logger.debug('T212 CSV downloaded and uploaded to S3.')
 
@@ -155,14 +161,12 @@ def run(input_dt: date) -> None:
     digrin_df: pd.DataFrame = transform_df(t212_df)
 
     digrin_df_encoded: bytes = encode_df(digrin_df)
-    s3.upload_fileobj(
-        Fileobj=BytesIO(digrin_df_encoded), Bucket=BUCKET_NAME, Key=f'digrin/{filename}'
+    upload_file(
+        fileobj=BytesIO(digrin_df_encoded),
+        bucket=BUCKET_NAME,
+        key=f'digrin/{filename}'
     )
     logger.debug('Digrin CSV transformed and uploaded to S3.')
 
-    digrin_csv_url = s3.generate_presigned_url(
-        'get_object',
-        Params={'Bucket': BUCKET_NAME, 'Key': f'digrin/{filename}'},
-        ExpiresIn=120, # 2min
-    )
+    digrin_csv_url = get_download_url(bucket=BUCKET_NAME, key=f'digrin/{filename}')
     logger.info(f'Digrin CSV url: {digrin_csv_url}')

@@ -1,10 +1,11 @@
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
 import logging
+from datetime import date, datetime
 
+from dateutil.relativedelta import relativedelta
+
+from .logging_config import configure_logging
 from .main import run
 from .utils import log_func
-from .logging_config import configure_logging
 
 logger = logging.getLogger(__name__)
 configure_logging()
