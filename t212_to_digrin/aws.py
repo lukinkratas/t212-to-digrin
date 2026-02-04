@@ -9,8 +9,9 @@ from .utils import log_func
 
 logger = logging.getLogger(__name__)
 
-secrets_manager = boto3.client("secretsmanager")
-s3 = boto3.client("s3")
+session = boto3.Session(profile_name="t212-to-digrin-cli")
+secrets_manager = session.client("secretsmanager")
+s3 = session.client("s3")
 
 
 def _request(func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
