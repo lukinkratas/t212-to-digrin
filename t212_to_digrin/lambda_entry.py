@@ -1,7 +1,7 @@
-from typing import Any
 import json
 import logging
 from datetime import date
+from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
