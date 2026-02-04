@@ -18,6 +18,11 @@ logger = logging.getLogger(__name__)
 BUCKET_NAME = "t212-to-digrin"
 NRETRIES = 5
 
+t212_secret = get_secret("t212")
+t212 = T212Client(
+    api_key_id=t212_secret["API_KEY_ID"], secret_key=t212_secret["SECRET_KEY"]
+)
+
 
 @log_func(logger.info)
 def create_report(
@@ -29,12 +34,6 @@ def create_report(
 
     if isinstance(to_dt, (date, datetime)):
         to_dt = to_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    t212_secret = get_secret("t212")
-    t212 = T212Client(
-        api_key_id=t212_secret["API_KEY_ID"],
-        secret_key=t212_secret["SECRET_KEY"],
-    )
 
     msg = "Attempt no. {idx}/{total} {status}."
 
