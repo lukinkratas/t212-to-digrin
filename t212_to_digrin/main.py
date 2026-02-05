@@ -112,25 +112,24 @@ def transform_df(report_df: pd.DataFrame) -> pd.DataFrame:
 
     # Apply the mapping to the ticker column
     ticker_map: dict[str, str] = {
+        "MC": "MC.PA",
+        "ASML": "ASML.AS",
         "VWCE": "VWCE.DE",
         "VUAA": "VUAA.DE",
         "SXRV": "SXRV.DE",
         "ZPRV": "ZPRV.DE",
         "ZPRX": "ZPRX.DE",
-        "MC": "MC.PA",
-        "ASML": "ASML.AS",
+        "NUKL": "NUKL.DE",
+        "AVWS": "AVWS.DE",
         "CSPX": "CSPX.L",
         "EISU": "EISU.L",
         "IITU": "IITU.L",
         "IUHC": "IUHC.L",
         "NDIA": "NDIA.L",
-        "NUKL": "NUKL.DE",
-        "AVWS": "AVWS.DE",
     }
     report_df["Ticker"] = report_df["Ticker"].replace(ticker_map)
 
-    # convert dtypes
-    return report_df.convert_dtypes()
+    return report_df.convert_dtypes().reset_index(drop=True)
 
 
 @log_func(logger.info)
@@ -140,19 +139,8 @@ def download_report(url: str) -> bytes:
     response.raise_for_status()
     return response.content
 
-
 @log_func(logger.info)
-def run(input_dt: date, generate_download_url: bool = False) -> None:
-    """Common runner logic shared between CLI and lambda entrypoints."""
-    from_dt = input_dt.replace(day=1)
-    to_dt = from_dt + relativedelta(months=1)
-
-    report = create_report(from_dt, to_dt)
-    download_link = report["downloadLink"]
-    t212_df_encoded = download_report(download_link)
-
-    filename: str = f"{input_dt.strftime('%Y-%m')}.csv"
-
+def upload_to_aws(t212_df_encoded: bytes, filename: str, generate_download_url: bool = False) -> None:
     upload_file(
         fileobj=BytesIO(t212_df_encoded),
         bucket=BUCKET_NAME,
@@ -164,7 +152,7 @@ def run(input_dt: date, generate_download_url: bool = False) -> None:
 
     digrin_df: pd.DataFrame = transform_df(t212_df)
 
-    digrin_df_encoded: bytes = encode_df(digrin_df)
+    digrin_df_encoded = encode_df(digrin_df)
     upload_file(
         fileobj=BytesIO(digrin_df_encoded), bucket=BUCKET_NAME, key=f"digrin/{filename}"
     )
@@ -173,3 +161,18 @@ def run(input_dt: date, generate_download_url: bool = False) -> None:
     if generate_download_url:
         digrin_csv_url = get_download_url(bucket=BUCKET_NAME, key=f"digrin/{filename}")
         logger.info(f"Digrin CSV url: {digrin_csv_url}")
+
+@log_func(logger.info)
+def run(input_dt: date, generate_download_url: bool = False) -> None:
+    """Common runner logic shared between CLI and lambda entrypoints."""
+    from_dt = input_dt.replace(day=1)
+    to_dt = from_dt + relativedelta(months=1)
+
+    report = create_report(from_dt, to_dt)
+    download_link = report["downloadLink"]
+
+    upload_to_aws(
+        t212_df_encoded=download_report(download_link),
+        filename=f"{input_dt.strftime('%Y-%m')}.csv",
+        generate_download_url=generate_download_url,
+    )
