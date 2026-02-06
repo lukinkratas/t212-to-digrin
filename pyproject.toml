@@ -1,7 +1,7 @@
 [project]
 name = "t212-to-digrin"
 version = "0.1.0"
-description = "Python application package for exporting T212 monthly report automation via rest API calls. Monthly report is then transformed for Digrin and stored in AWS S3. Can be run from CLI or AWS lambda."
+description = "Python package for exporting T212 monthly report automation via rest API calls. Monthly report is then transformed for Digrin and stored in AWS S3. Can be run from CLI or AWS lambda."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
