@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 import time
 from datetime import date, datetime
@@ -10,16 +9,14 @@ from typing import Any
 import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
-from dotenv import load_dotenv
 
 from .aws import get_download_url, get_secret, upload_file
 from .t212 import Client as T212Client
 from .utils import decode_csv, encode_df, log_func
 
 logger = logging.getLogger(__name__)
-load_dotenv()
 
-S3_BUCKET = os.environ["AWS_S3_BUCKET"]
+S3_BUCKET = "t212-to-digrin"
 NRETRIES = 5
 
 
