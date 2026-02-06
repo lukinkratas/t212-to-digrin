@@ -51,7 +51,7 @@ class Client(object):
             logger.warning(e)
             return None
 
-        return response.json().get("reportId")
+        return response.json()["reportId"]
 
     @log_func(logger.debug)
     def list_exports(self) -> list[dict[str, Any]] | None:
