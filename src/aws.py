@@ -4,8 +4,8 @@ from functools import lru_cache
 from typing import Any, Callable
 
 import boto3
-from botocore.exceptions import ClientError
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from .utils import log_func
 
