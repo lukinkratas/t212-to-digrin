@@ -7,28 +7,18 @@ def configure_logging() -> None:
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "simple": {
-                "class": "logging.Formatter",
-                "datefmt": "%Y-%m-%dT%H:%M:%SZ",
-                "format": ("%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"),
-            },
-            "detailed": {
+            "default": {
                 "class": "logging.Formatter",
                 "datefmt": "%Y-%m-%dT%H:%M:%SZ",
                 "format": (
-                    "%(asctime)s|"
-                    "%(levelname)-8s|"
-                    "%(name)-20s|"
-                    "%(filename)-8s:%(lineno)-3d|"
-                    "%(funcName)s: "
-                    "%(message)s"
+                    "%(asctime)s | %(levelname)-8s | %(name)-20s | %(message)s"
                 ),
             },
         },
         "handlers": {
             "stream_handler": {
                 "class": "logging.StreamHandler",
-                "formatter": "detailed",
+                "formatter": "default",
                 "level": "DEBUG",
             },
         },
