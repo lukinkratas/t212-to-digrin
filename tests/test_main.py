@@ -1,4 +1,7 @@
+from typing import Any
+import json
 import pytest
+from pytest_mock import MockerFixture
 from datetime import date
 import pathlib
 
@@ -9,11 +12,13 @@ from dateutil.relativedelta import relativedelta
 from t212_to_digrin.main import create_report, upload_to_aws, transform_df
 from t212_to_digrin.utils import encode_df
 
+FIXTURE_PATH = pathlib.Path(__file__).resolve().parent.joinpath('fixtures')
 
 def get_csv_fixture(filename: str) -> pd.DataFrame:
-    fixture_path = pathlib.Path(__file__).resolve().parent.joinpath('fixtures')
-    return pd.read_csv(fixture_path.joinpath(filename))
+    return pd.read_csv(FIXTURE_PATH.joinpath(filename))
 
+def get_json_fixture(filename: str) -> dict[str, Any]:
+    return json.loads(FIXTURE_PATH.joinpath(filename).read_text())
 
 @pytest.fixture
 def t212_df() -> pd.DataFrame:
@@ -23,23 +28,41 @@ def t212_df() -> pd.DataFrame:
 def digrin_df() -> pd.DataFrame:
     return get_csv_fixture('digrin.csv')
 
-def test_create_report() -> None:
-    # mock t212 calls
+@pytest.fixture
+def export() -> dict[str, Any]:
+    return get_json_fixture('export.json')
 
-    from_dt = date.today()
-    to_dt = from_dt + relativedelta(months=1)
-    # create_report(from_dt, to_dt)
+@pytest.fixture
+def secret() -> dict[str, str]:
+    return get_json_fixture('secret.json')
 
+@pytest.fixture(autouse=True)
+def mock_sleep(mocker: MockerFixture) -> None:
+    """Skip all sleep calls in tests"""
+    mocker.patch("time.sleep", return_value=None)
 
 def test_transform_df(t212_df: pd.DataFrame, digrin_df: pd.DataFrame) -> None:
     assert_frame_equal(transform_df(t212_df), digrin_df, check_dtype=False)
 
+def test_create_report(mocker: MockerFixture, secret: dict[str, str], export: dict[str, int], mock_sleep: None) -> None:
 
-def test_upload_to_aws(t212_df: pd.DataFrame) -> None:
-    # mock aws calls
+    mocker.patch("t212_to_digrin.main.get_secret", return_value=secret)
+
+    mock_client = mocker.Mock()
+    mock_client.export_report.return_value = export["reportId"]
+    mock_client.list_exports.return_value = [export]
+    mocker.patch("t212_to_digrin.main._get_t212_client", return_value=mock_client)
+
+    from_dt = date.today()
+    to_dt = from_dt + relativedelta(months=1)
+    assert create_report(from_dt, to_dt) == export
+
+
+def test_upload_to_aws(t212_df: pd.DataFrame, mocker: MockerFixture) -> None:
+    mocker.patch("t212_to_digrin.main.upload_file", return_value=None)
+    mocker.patch("t212_to_digrin.main.get_download_url", return_value="https://t212-to-digrin.s3.amazonaws.com/xxx/YYYY-mm.csv?X-Amz-Algorithm=xxx&X-Amz-Credential=xxx&X-Amz-Date=xxx&X-Amz-Expires=xxx&X-Amz-SignedHeaders=host&X-Amz-Signature=xxx")
 
     t212_df_encoded = encode_df(t212_df)
     filename = "YYYY-mm.csv"
     generate_download_url = True
-    # upload_to_aws(t212_df_encoded, filename, generate_download_url)
-    pass
+    upload_to_aws(t212_df_encoded, filename, generate_download_url)
