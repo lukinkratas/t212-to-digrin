@@ -60,3 +60,6 @@ strict = true
 explicit_package_bases = true
 ignore_missing_imports = true
 disable_error_code = ["no-any-return", "union-attr", "misc"]
+
+[tool.pytest.ini_options]
+addopts = ["-vv", "-p", "no:warnings", "--cov=t212_to_digrin", "--cov-report=term-missing", "--cov-branch"]
