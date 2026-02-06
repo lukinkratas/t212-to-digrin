@@ -1,3 +1,4 @@
+import os
 import logging
 import sys
 import time
@@ -9,14 +10,16 @@ from typing import Any
 import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
+from dotenv import load_dotenv
 
 from .aws import get_download_url, get_secret, upload_file
 from .t212 import Client as T212Client
 from .utils import decode_csv, encode_df, log_func
 
 logger = logging.getLogger(__name__)
+load_dotenv()
 
-BUCKET_NAME = "t212-to-digrin"
+S3_BUCKET = os.environ['AWS_S3_BUCKET']
 NRETRIES = 5
 
 
@@ -154,7 +157,7 @@ def upload_to_aws(
     """Call AWS endpoints to store csvs."""
     upload_file(
         fileobj=BytesIO(t212_csv_encoded),
-        bucket=BUCKET_NAME,
+        bucket=S3_BUCKET,
         key=f"t212/{filename}",
     )
     logger.debug("T212 CSV downloaded and uploaded to S3.")
@@ -164,13 +167,13 @@ def upload_to_aws(
     digrin_csv_encoded = encode_df(digrin_df)
     upload_file(
         fileobj=BytesIO(digrin_csv_encoded),
-        bucket=BUCKET_NAME,
+        bucket=S3_BUCKET,
         key=f"digrin/{filename}",
     )
     logger.debug("Digrin CSV transformed and uploaded to S3.")
 
     if generate_download_url:
-        digrin_csv_url = get_download_url(bucket=BUCKET_NAME, key=f"digrin/{filename}")
+        digrin_csv_url = get_download_url(bucket=S3_BUCKET, key=f"digrin/{filename}")
         logger.info(f"Digrin CSV url: {digrin_csv_url}")
 
 
