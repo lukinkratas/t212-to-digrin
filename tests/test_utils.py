@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from src.utils import decode_csv, encode_df
+from t212_to_digrin.utils import decode_csv, encode_df
 
 
 @pytest.fixture

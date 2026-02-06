@@ -9,8 +9,8 @@ from dateutil.relativedelta import relativedelta
 from pandas.testing import assert_frame_equal
 from pytest_mock import MockerFixture
 
-from src.main import create_report, transform_df, upload_to_aws
-from src.utils import encode_df
+from t212_to_digrin.main import create_report, transform_df, upload_to_aws
+from t212_to_digrin.utils import encode_df
 
 FIXTURE_PATH = pathlib.Path(__file__).resolve().parent.joinpath("fixtures")
 
@@ -59,12 +59,12 @@ def test_create_report(
     export: dict[str, int],
     mock_sleep: None,
 ) -> None:
-    mocker.patch("src.main.get_secret", return_value=secret)
+    mocker.patch("t212_to_digrin.main.get_secret", return_value=secret)
 
     mock_client = mocker.Mock()
     mock_client.export_report.return_value = export["reportId"]
     mock_client.list_exports.return_value = [export]
-    mocker.patch("src.main._get_t212_client", return_value=mock_client)
+    mocker.patch("t212_to_digrin.main._get_t212_client", return_value=mock_client)
 
     from_dt = date.today()
     to_dt = from_dt + relativedelta(months=1)
@@ -72,9 +72,9 @@ def test_create_report(
 
 
 def test_upload_to_aws(t212_df: pd.DataFrame, mocker: MockerFixture) -> None:
-    mocker.patch("src.main.upload_file", return_value=None)
+    mocker.patch("t212_to_digrin.main.upload_file", return_value=None)
     mocker.patch(
-        "src.main.get_download_url",
+        "t212_to_digrin.main.get_download_url",
         return_value="https://t212-to-digrin.s3.amazonaws.com/xxx/YYYY-mm.csv?X-Amz-Algorithm=xxx&X-Amz-Credential=xxx&X-Amz-Date=xxx&X-Amz-Expires=xxx&X-Amz-SignedHeaders=host&X-Amz-Signature=xxx",
     )
 
