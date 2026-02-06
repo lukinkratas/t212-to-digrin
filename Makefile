@@ -22,5 +22,4 @@ typechk:
 	uv run --dev mypy .
 
 test:
-	uv run --dev pytest tests/ --cov=t212_to_digrin --cov-report=term-missing --cov-branch
-
+	uv run --dev pytest tests/ -vv -p no:warnings --cov=src --cov-report=term-missing --cov-branch --cov-report=html:htmlcov
