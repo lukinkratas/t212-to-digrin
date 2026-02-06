@@ -5,7 +5,5 @@ __pycache__
 
 .venv
 .env
-*.csv
 *.pdf
-*poc.py
 .coverage
