@@ -37,5 +37,5 @@ Monthly report is then transformed for Digrin and stored in AWS S3.
 - [x] warning / err log record formatting
 - [x] presigned url only in CLI, lambda not
 - [ ] deploy lambda gh action
-- [ ] AWS tags, resource group, application (after terraform)
+- [ ] terraform deployment + AWS tags, resource group, application
 - [ ] cc like tui
