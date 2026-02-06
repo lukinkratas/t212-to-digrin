@@ -4,6 +4,7 @@ import time
 from datetime import date, datetime
 from io import BytesIO
 from typing import Any
+from functools import lru_cache
 
 import pandas as pd
 import requests
@@ -18,10 +19,13 @@ logger = logging.getLogger(__name__)
 BUCKET_NAME = "t212-to-digrin"
 NRETRIES = 5
 
-t212_secret = get_secret("t212")
-t212 = T212Client(
-    api_key_id=t212_secret["API_KEY_ID"], secret_key=t212_secret["SECRET_KEY"]
-)
+@lru_cache
+def _get_t212_client() -> T212Client:
+    secret = get_secret("t212")
+    return T212Client(
+        api_key_id=secret["API_KEY_ID"],
+        secret_key=secret["SECRET_KEY"],
+    )
 
 
 @log_func(logger.info)
@@ -35,11 +39,12 @@ def create_report(
     if isinstance(to_dt, (date, datetime)):
         to_dt = to_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
+    t212_client = _get_t212_client()
     msg = "Attempt no. {idx}/{total} {status}."
 
     for idx in range(1, NRETRIES + 1):
         logger.debug(msg.format(idx=idx, total=NRETRIES, status="started"))
-        report_id = t212.export_report(from_dt, to_dt)
+        report_id = t212_client.export_report(from_dt, to_dt)
 
         if report_id is None:
             logger.warning(msg.format(idx=idx, total=NRETRIES, status="failed"))
@@ -60,7 +65,7 @@ def create_report(
     for idx in range(1, NRETRIES + 1):
         logger.debug(msg.format(idx=idx, total=NRETRIES, status="started"))
 
-        reports = t212.list_exports()
+        reports = t212_client.list_exports()
 
         if reports is None:
             logger.warning(msg.format(idx=idx, total=NRETRIES, status="failed"))
