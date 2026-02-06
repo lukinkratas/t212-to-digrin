@@ -1,6 +1,7 @@
 import json
 import logging
 from typing import Any, Callable
+from functools import lru_cache
 
 import boto3
 from botocore.exceptions import ClientError
@@ -9,10 +10,19 @@ from .utils import log_func
 
 logger = logging.getLogger(__name__)
 
-session = boto3.Session(profile_name="t212-to-digrin-cli")
-secrets_manager = session.client("secretsmanager")
-s3 = session.client("s3")
+@lru_cache
+def _get_session() -> boto3.Session:
+    return boto3.Session(profile_name="t212-to-digrin-cli")
 
+
+@lru_cache
+def _get_secrets_client():
+    return _get_session().client("secretsmanager")
+
+
+@lru_cache
+def _get_s3_client():
+    return _get_session().client("s3")
 
 def _request(func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
     """Wrap boto function in try-except block."""
@@ -29,21 +39,24 @@ def _request(func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
 @log_func(logger.debug)
 def get_secret(secret_name: str) -> str:
     """Fetch secret key-value pairs from Secrets Manager Service."""
-    response = _request(secrets_manager.get_secret_value, SecretId=secret_name)
+    secrets_client = _get_secrets_client()
+    response = _request(secrets_client.get_secret_value, SecretId=secret_name)
     return json.loads(response["SecretString"])
 
 
 @log_func(logger.debug)
 def upload_file(fileobj: bytes, bucket: str, key: str) -> None:
     """Upload file bytes to S3 service."""
-    _request(s3.upload_fileobj, Fileobj=fileobj, Bucket=bucket, Key=key)
+    s3_client = _get_s3_client()
+    _request(s3_client.upload_fileobj, Fileobj=fileobj, Bucket=bucket, Key=key)
 
 
 @log_func(logger.debug)
 def get_download_url(bucket: str, key: str) -> str:
     """Generate a download url for file stored in S3 service."""
+    s3_client = _get_s3_client()
     return _request(
-        s3.generate_presigned_url,
+        s3_client.generate_presigned_url,
         "get_object",
         Params={"Bucket": bucket, "Key": key},
         ExpiresIn=60,  # 1min
