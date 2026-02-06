@@ -1,6 +1,6 @@
 # T212 to Digrin
 
-Python application package for exporting T212 monthly report automation via rest API calls.
+Python package for exporting T212 monthly report automation via rest API calls.
 Monthly report is then transformed for Digrin and stored in AWS S3.
 Can be run from CLI or AWS lambda.
 
