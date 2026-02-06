@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 import sys
 import time
 from datetime import date, datetime
@@ -19,7 +19,7 @@ from .utils import decode_csv, encode_df, log_func
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-S3_BUCKET = os.environ['AWS_S3_BUCKET']
+S3_BUCKET = os.environ["AWS_S3_BUCKET"]
 NRETRIES = 5
 
 

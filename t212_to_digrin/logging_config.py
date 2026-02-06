@@ -10,9 +10,7 @@ def configure_logging() -> None:
             "default": {
                 "class": "logging.Formatter",
                 "datefmt": "%Y-%m-%dT%H:%M:%SZ",
-                "format": (
-                    "%(asctime)s | %(levelname)-8s | %(name)-19s | %(message)s"
-                ),
+                "format": "%(asctime)s | %(levelname)-8s | %(name)-19s | %(message)s",
             },
         },
         "handlers": {

@@ -23,7 +23,7 @@ typechk:
 	uv run --dev mypy .
 
 test:
-	uv run --dev pytest tests/ 
+	uv run --dev pytest tests/
 
 test-htmlcov:
 	uv run --dev pytest tests/ --cov-report=html:htmlcov
