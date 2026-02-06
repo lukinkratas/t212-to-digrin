@@ -26,10 +26,11 @@ Can be run from CLI or AWS lambda.
 ```
 
 # TODO
-- [ ] add unit tests with mocking
+- [x] add unit tests with mocking
 - [x] format and lint
 - [x] typechk
 - [x] why is not get_input_dt logger? -> NOPE
 - [x] warning / err log record formatting
-- [ ] AWS tags, resource group, application (after terraform)
 - [x] presigned url only in CLI, lambda not
+- [ ] AWS tags, resource group, application (after terraform)
+- [ ] cc like tui
