@@ -1,7 +1,7 @@
 import json
 import logging
-from typing import Any, Callable
 from functools import lru_cache
+from typing import Any, Callable
 
 import boto3
 from botocore.exceptions import ClientError
@@ -10,19 +10,24 @@ from .utils import log_func
 
 logger = logging.getLogger(__name__)
 
+
 @lru_cache
 def _get_session() -> boto3.Session:
+    """Lazy init session."""
     return boto3.Session(profile_name="t212-to-digrin-cli")
 
 
 @lru_cache
-def _get_secrets_client():
+def _get_secrets_client() -> boto3.SecretsManager.Client:
+    """Lazy init secrets client."""
     return _get_session().client("secretsmanager")
 
 
 @lru_cache
-def _get_s3_client():
+def _get_s3_client() -> boto3.S3.Client:
+    """Lazy init s3 client."""
     return _get_session().client("s3")
+
 
 def _request(func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
     """Wrap boto function in try-except block."""

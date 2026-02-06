@@ -6,16 +6,16 @@ from typing import Any
 import pandas as pd
 
 
-def decode_to_df(encoded_df: bytes, **kwargs: Any) -> pd.DataFrame:
-    """Decode bytes to Pandas Dataframe."""
-    return pd.read_csv(StringIO(encoded_df.decode("utf-8")), **kwargs)
+def decode_csv(encoded_csv: bytes, **kwargs: Any) -> pd.DataFrame:
+    """Decode csv bytes to Pandas Dataframe."""
+    return pd.read_csv(StringIO(encoded_csv.decode("utf-8")), **kwargs)
 
 
-def encode_df(decoded_df: pd.DataFrame, **kwargs: Any) -> bytes:
+def encode_df(df: pd.DataFrame, **kwargs: Any) -> bytes:
     """Encode Pandas Dataframe to bytes."""
     index = kwargs.pop("index", False)
     bytes = BytesIO()
-    decoded_df.to_csv(bytes, index=index, **kwargs)
+    df.to_csv(bytes, index=index, **kwargs)
     bytes.seek(0)
     return bytes.getvalue()
 

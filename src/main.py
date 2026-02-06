@@ -2,9 +2,9 @@ import logging
 import sys
 import time
 from datetime import date, datetime
+from functools import lru_cache
 from io import BytesIO
 from typing import Any
-from functools import lru_cache
 
 import pandas as pd
 import requests
@@ -12,15 +12,17 @@ from dateutil.relativedelta import relativedelta
 
 from .aws import get_download_url, get_secret, upload_file
 from .t212 import Client as T212Client
-from .utils import decode_to_df, encode_df, log_func
+from .utils import decode_csv, encode_df, log_func
 
 logger = logging.getLogger(__name__)
 
 BUCKET_NAME = "t212-to-digrin"
 NRETRIES = 5
 
+
 @lru_cache
 def _get_t212_client() -> T212Client:
+    """Lazy init t212.Client."""
     secret = get_secret("t212")
     return T212Client(
         api_key_id=secret["API_KEY_ID"],
@@ -144,28 +146,33 @@ def download_report(url: str) -> bytes:
     response.raise_for_status()
     return response.content
 
+
 @log_func(logger.info)
-def upload_to_aws(t212_df_encoded: bytes, filename: str, generate_download_url: bool = False) -> None:
+def upload_to_aws(
+    t212_csv_encoded: bytes, filename: str, generate_download_url: bool = False
+) -> None:
+    """Call AWS endpoints to store csvs."""
     upload_file(
-        fileobj=BytesIO(t212_df_encoded),
+        fileobj=BytesIO(t212_csv_encoded),
         bucket=BUCKET_NAME,
         key=f"t212/{filename}",
     )
     logger.debug("T212 CSV downloaded and uploaded to S3.")
 
-    t212_df: pd.DataFrame = decode_to_df(t212_df_encoded)
-
-    digrin_df: pd.DataFrame = transform_df(t212_df)
-
-    digrin_df_encoded = encode_df(digrin_df)
+    t212_df = decode_csv(t212_csv_encoded)
+    digrin_df = transform_df(t212_df)
+    digrin_csv_encoded = encode_df(digrin_df)
     upload_file(
-        fileobj=BytesIO(digrin_df_encoded), bucket=BUCKET_NAME, key=f"digrin/{filename}"
+        fileobj=BytesIO(digrin_csv_encoded),
+        bucket=BUCKET_NAME,
+        key=f"digrin/{filename}",
     )
     logger.debug("Digrin CSV transformed and uploaded to S3.")
 
     if generate_download_url:
         digrin_csv_url = get_download_url(bucket=BUCKET_NAME, key=f"digrin/{filename}")
         logger.info(f"Digrin CSV url: {digrin_csv_url}")
+
 
 @log_func(logger.info)
 def run(input_dt: date, generate_download_url: bool = False) -> None:
@@ -177,7 +184,7 @@ def run(input_dt: date, generate_download_url: bool = False) -> None:
     download_link = report["downloadLink"]
 
     upload_to_aws(
-        t212_df_encoded=download_report(download_link),
+        t212_csv_encoded=download_report(download_link),
         filename=f"{input_dt.strftime('%Y-%m')}.csv",
         generate_download_url=generate_download_url,
     )
