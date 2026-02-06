@@ -8,5 +8,3 @@ __pycache__
 *.csv
 *.pdf
 *poc.py
-
-tests/unit/*json
