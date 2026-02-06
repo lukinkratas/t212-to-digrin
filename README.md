@@ -2,22 +2,26 @@
 
 Python package for exporting T212 monthly report automation via rest API calls.
 Monthly report is then transformed for Digrin and stored in AWS S3.
-Can be run from CLI or AWS lambda.
+
+- run from CLI or AWS lambda.
+
+![cli](doc/cli.png)
 
 1. Get input year_month (CLI only).
-3. POST on T212 export endpoint.
-4. GET on T212 list exports endpoint.
-5. Download T212 CSV report and upload it to S3.
-8. Transform (to Digrin form) and upload to S3.
+2. T212 export report endpoint.
+3. Download CSV report, transform it and upload to S3.
 
 ## CLI
 
 ### Setup
 
 **Requirements**:
-- T212 api key (only all history perms)
-- T212 api key in AWS Secrets Manager.
-- configure AWS CLI via `aws configure` (or use .env)
+- T212 api key (only all history perms) stored AWS Secrets Manager.
+- AWS IAM role with perms:
+  - S3 GetObject (need for presigned url)
+  - S3 PutObject (needed to store csvs)
+  - SecretsManager GetSecretValue
+- `aws configure --profile t212-to-digrin-cli`
 
 ### Run
 
@@ -32,5 +36,6 @@ Can be run from CLI or AWS lambda.
 - [x] why is not get_input_dt logger? -> NOPE
 - [x] warning / err log record formatting
 - [x] presigned url only in CLI, lambda not
+- [ ] deploy lambda gh action
 - [ ] AWS tags, resource group, application (after terraform)
 - [ ] cc like tui
