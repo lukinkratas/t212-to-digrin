@@ -5,6 +5,7 @@ from typing import Any, Callable
 
 import boto3
 from botocore.exceptions import ClientError
+from botocore.client import BaseClient
 
 from .utils import log_func
 
@@ -18,13 +19,13 @@ def _get_session() -> boto3.Session:
 
 
 @lru_cache
-def _get_secrets_client() -> boto3.SecretsManager.Client:
+def _get_secrets_client() -> BaseClient:
     """Lazy init secrets client."""
     return _get_session().client("secretsmanager")
 
 
 @lru_cache
-def _get_s3_client() -> boto3.S3.Client:
+def _get_s3_client() -> BaseClient:
     """Lazy init s3 client."""
     return _get_session().client("s3")
 
