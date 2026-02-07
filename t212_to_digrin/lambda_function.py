@@ -5,8 +5,8 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
-from t212_to_digrin.logging_config import configure_logging
-from t212_to_digrin.main import run
+from logging_config import configure_logging
+from main import run
 
 logger = logging.getLogger(__name__)
 configure_logging()
