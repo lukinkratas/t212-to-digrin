@@ -11,17 +11,25 @@ Monthly report is then transformed for Digrin and stored in AWS S3.
 2. T212 export report endpoint.
 3. Download CSV report, transform it and upload to S3.
 
-## CLI
-
 ### Setup
 
 **Requirements**:
-- T212 api key (only all history perms) stored AWS Secrets Manager.
-- AWS IAM role with perms:
+- T212 API_KEY_ID and SECRET_KEY (only all history perms)
+- AWS Secrets Manager - store T212 secrets
+- AWS Lambda
+- AWS IAM policies:
   - S3 GetObject (need for presigned url)
   - S3 PutObject (needed to store csvs)
-  - SecretsManager GetSecretValue
-- `aws configure --profile t212-to-digrin-cli`
+  - SecretsManager GetSecretValue (needed for T212 secrets)
+- AWS IAM roles:
+  - lambda role
+  - GH action role
+- AWS IAM user - CLI user
+- AWS IAM identity provider - GH action tokens
+
+#### CLI
+
+`aws configure --profile t212-to-digrin-cli`
 
 ### Run
 
