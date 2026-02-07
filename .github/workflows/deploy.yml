@@ -28,5 +28,5 @@ jobs:
       with:
         function-name: t212-to-digrin
         code-artifacts-dir: t212_to_digrin
-        handler: lambda_handler
+        handler: lambda_function.lambda_handler
         runtime: python3.14
