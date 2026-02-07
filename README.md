@@ -3,7 +3,7 @@
 Python package for exporting T212 monthly report automation via rest API calls.
 Monthly report is then transformed for Digrin and stored in AWS S3.
 
-- run from CLI or AWS lambda.
+- run from CLI or AWS lambda
 
 ![cli](doc/cli.png)
 
