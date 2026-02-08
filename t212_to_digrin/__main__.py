@@ -3,9 +3,9 @@ from datetime import date, datetime
 
 from dateutil.relativedelta import relativedelta
 
-from .logging_config import configure_logging
-from .main import run
-from .utils import log_func
+from t212_to_digrin.logging_config import configure_logging
+from t212_to_digrin.main import run
+from t212_to_digrin.utils import log_func
 
 logger = logging.getLogger(__name__)
 configure_logging()

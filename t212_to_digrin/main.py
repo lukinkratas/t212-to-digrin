@@ -10,9 +10,9 @@ import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
 
-from .aws import get_download_url, get_secret, upload_file
-from .t212 import Client as T212Client
-from .utils import decode_csv, encode_df, log_func
+from t212_to_digrin.aws import get_download_url, get_secret, upload_file
+from t212_to_digrin.t212 import Client as T212Client
+from t212_to_digrin.utils import decode_csv, encode_df, log_func
 
 logger = logging.getLogger(__name__)
 

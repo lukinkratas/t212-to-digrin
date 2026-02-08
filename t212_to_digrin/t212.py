@@ -4,7 +4,7 @@ from typing import Any
 import requests
 from requests.exceptions import HTTPError
 
-from .utils import log_func
+from t212_to_digrin.utils import log_func
 
 logger = logging.getLogger(__name__)
 
