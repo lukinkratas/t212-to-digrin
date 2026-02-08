@@ -30,3 +30,5 @@ jobs:
         code-artifacts-dir: t212_to_digrin
         handler: lambda_function.lambda_handler
         runtime: python3.14
+        layers: [ "AWSSDKPandas-Python314" ]
+        timeout: 30
