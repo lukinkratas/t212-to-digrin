@@ -4,7 +4,6 @@ from datetime import date
 from typing import Any
 
 from dateutil.relativedelta import relativedelta
-
 from logging_config import configure_logging
 from main import run
 
