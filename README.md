@@ -22,7 +22,7 @@ Can be run from CLI or AWS lambda.
 
 ### Run (CLI only)
 
-**Requirements (CLI only):** `aws configure --profile t212-to-digrin-cli` (CLI only)
+**Requirements:** `aws configure --profile t212-to-digrin-cli`
 
 ```bash
 uv run python -m t212_to_digrin
