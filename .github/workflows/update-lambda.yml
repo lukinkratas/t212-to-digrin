@@ -1,0 +1,32 @@
+name: Update AWS Lambda
+
+on:
+  workflow_run:
+    workflows: ["Test"]
+    types: ["completed"]
+    paths: ["t212_to_digrin/**"]
+
+permissions:
+  contents: read    # This is required to checkout the repository
+  id-token: write   # This is required for OIDC authentication
+
+jobs:
+  update-lambda:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Build
+      run: make build
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_UPDATE_LAMBDA }}
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Update Lambda Function
+      run: make update-lambda
