@@ -33,14 +33,3 @@ def get_secret(secrets_client: BaseClient, secret_name: str) -> str:
 def upload_file(s3_client: BaseClient, fileobj: bytes, bucket: str, key: str) -> None:
     """Upload file bytes to S3 service."""
     _request(s3_client.upload_fileobj, Fileobj=fileobj, Bucket=bucket, Key=key)
-
-
-@log_func(logger.debug)
-def get_download_url(s3_client: BaseClient, bucket: str, key: str) -> str:
-    """Generate a download url for file stored in S3 service."""
-    return _request(
-        s3_client.generate_presigned_url,
-        "get_object",
-        Params={"Bucket": bucket, "Key": key},
-        ExpiresIn=60,  # 1min
-    )

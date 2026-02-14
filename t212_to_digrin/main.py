@@ -12,7 +12,7 @@ from boto3 import Session
 from botocore.client import BaseClient
 from dateutil.relativedelta import relativedelta
 
-from .aws import get_download_url, get_secret, upload_file
+from .aws import get_secret, upload_file
 from .t212 import Client as T212Client
 from .utils import decode_csv, encode_df, log_func
 
@@ -169,7 +169,7 @@ def upload_to_aws(
     session: Session,
     t212_csv_encoded: bytes,
     filename: str,
-    generate_download_url: bool = False,
+    store_locally: bool = False,
 ) -> None:
     """Call AWS endpoints to store csvs."""
     s3_client = _get_s3_client(session)
@@ -193,15 +193,13 @@ def upload_to_aws(
     )
     logger.debug("Digrin CSV transformed and uploaded to S3.")
 
-    if generate_download_url:
-        digrin_csv_url = get_download_url(
-            s3_client, bucket=BUCKET, key=f"digrin/{filename}"
-        )
-        logger.info(f"Digrin CSV url: {digrin_csv_url}")
+    if store_locally:
+        digrin_df.to_csv(filename, index=False)
+        logger.info("Digrin CSV stored locally.")
 
 
 @log_func(logger.info)
-def run(input_dt: date, session: Session, generate_download_url: bool = False) -> None:
+def run(input_dt: date, session: Session, store_locally: bool = False) -> None:
     """Common runner logic shared between CLI and lambda entrypoints."""
     from_dt = input_dt.replace(day=1)
     to_dt = from_dt + relativedelta(months=1)
@@ -213,5 +211,5 @@ def run(input_dt: date, session: Session, generate_download_url: bool = False) -
         session,
         t212_csv_encoded=download_report(download_link),
         filename=f"{input_dt.strftime('%Y-%m')}.csv",
-        generate_download_url=generate_download_url,
+        store_locally=store_locally,
     )
