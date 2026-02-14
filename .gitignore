@@ -5,4 +5,7 @@ __pycache__
 
 .venv
 .env
-*.csv
+.coverage
+*.zip
+build
+.terraform

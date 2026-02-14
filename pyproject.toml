@@ -1,27 +1,64 @@
 [project]
-name = "cli-t212-to-digrin"
+name = "t212-to-digrin"
 version = "0.1.0"
-description = "Add your description here"
+description = "Custom automation script for Trading 212 portfolio analytics in Digrin."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "boto3>=1.37.18",
     "pandas>=2.2.3",
-    "python-dateutil>=2.9.0.post0",
-    "python-dotenv>=1.0.1",
     "requests>=2.32.3",
 ]
-
-[tool.mypy]
-struct = true
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.14.9",
+    "types-python-dateutil>=2.9.0.20260124",
+    "types-requests>=2.32.4.20260107",
+]
 
 [tool.ruff]
 line-length = 88
 indent-width = 4
 
 [tool.ruff.lint]
-extend-select = ["E501", "N", "R", "I", "C901", "PD", "NPY"]
+extend-select = [
+    "E501", # line too long
+    "N",    # PEP8 naming
+    "R",    # RSE - flake8 raise, RET - flake8 return, RUF - ruff specific
+    "I",    # isort
+    # "C901", # mccabe - complexity
+    "PD",   # pandas
+    "NPY",  # numpy
+    "D"     # pydocstyle
+]
+ignore = [
+    "D100", # missing docstring in public module
+    "D104", # missing docstring in public package
+    "D107", # missing docstring in __init__
+]
+
+[tool.ruff.lint.per-file-ignores]
+"api/schemas/*" = ["D101"] # missing docstring in public class
+"tests/*" = [
+    "D102", # missing docstring in public method
+    "D103", # missing docstring in public function
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.ruff.format]
-quote-style = "single"
 indent-style = "space"
+
+[tool.mypy]
+strict = true
+explicit_package_bases = true
+ignore_missing_imports = true
+disable_error_code = ["no-any-return", "union-attr", "misc"]
+
+[tool.pytest.ini_options]
+addopts = ["-vv", "-p", "no:warnings", "--cov=t212_to_digrin", "--cov-report=term-missing", "--cov-branch"]

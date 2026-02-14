@@ -1,28 +1,29 @@
-# T212 to Digrin CLI
-Python CLI tool for fetching T212 reports via API call and transforming them to be used in Digrin portfolio tracker. Stores the reports in AWS S3.
+# T212 to Digrin
 
+Custom automation script for Trading 212 portfolio analytics in Digrin.
+
+Exports Trading 212 monthly report via rest API calls.
+Monthly report is then transformed for Digrin and stored in AWS S3.
+Can be run from CLI or AWS lambda.
+
+![cli](doc/cli.png)
+
+1. Get input year_month (CLI only).
+2. T212 rest API calls to gen export and list reports endpoints with creds stored in AWS Secrets Manager.
+3. Download raw T212 CSV report and store it in AWS S3 via boto SDK.
+4. Transform the report to Digrin form and store it in AWS S3 via boto SDK.
+5. Generate S3 presigned URL for download via boto SDK (CLI only).
+
+### Technical Overview
+
+- [T212 rest API calls](https://docs.trading212.com/api)
+- AWS services used - Secrets Manager, S3, Event Bridge Scheduler, Lambda, IAM
+- Terraform IaC
+
+### Run (CLI only)
+
+**Requirements (CLI only):** `aws configure --profile t212-to-digrin-cli` (CLI only)
+
+```bash
+uv run python -m t212_to_digrin
 ```
-echo "T212_API_KEY=$T212_API_KEY" >> .env
-echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
-echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
-echo "AWS_REGION=AWS_REGION" >> .env
-echo "BUCKET_NAME=BUCKET_NAME" >> .env
-```
-
-```
-uv run main.py
-```
-
-# TODO
-
-- [ ] archive reports in parquet ?
-
-- [ ] add type hints for created variables in main()
-
-- [ ] add logging
-
-- [ ] add tests
-
-- [ ] investigate option of asyncio
-
-- [ ] yield fetchReports ?

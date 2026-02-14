@@ -1,0 +1,51 @@
+.PHONY: fmt lint lint-fix typechk test test-htmlcov clean-up build update-lambda
+
+help:
+	@echo "Available targets:"
+	@echo "  fmt              - Format the code using Ruff"
+	@echo "  lint             - Check linting of the code using Ruff"
+	@echo "  lint-fix         - Check and fix linting if the code using Ruff"
+	@echo "  typechk          - Type check the code using mypy"
+	@echo "  test             - Run unit tests"
+	@echo "  test-htmlcov     - Run unit tests with html coverage report"
+	@echo "  clean-up         - Clean up - remove htmlcov, __pycache__, pytest mypy and ruff cache dirs"
+	@echo "  build            - Run the build script and create zip for lambda"
+	@echo "  update-lambda    - Build and update lambda function code"
+	@echo "  help             - Show this help message"
+
+fmt:
+	uv run --dev ruff format
+
+lint:
+	uv run --dev ruff check
+
+lint-fix:
+	uv run --dev ruff check --fix
+
+typechk:
+	uv run --dev mypy .
+
+test:
+	uv run --dev pytest tests/
+
+test-htmlcov:
+	uv run --dev pytest tests/ --cov-report=html:htmlcov
+
+clean-up:
+	rm -rvf __pycache__ \
+		t212_to_digrin/__pycache__ \
+		.pytest_cache \
+		.mypy_cache \
+		.ruff_cache \
+		.coverage \
+		htmlcov \
+		build \
+		lambda.zip
+
+build:
+	scripts/build.sh
+
+update-lambda:
+	aws lambda update-function-code \
+		--function-name t212-to-digrin \
+		--zip-file fileb://lambda.zip
