@@ -32,7 +32,7 @@ def get_input_dt() -> date:
 def main() -> None:
     """Logic for CLI entrypoint."""
     input_dt = get_input_dt()
-    run(input_dt, session, generate_download_url=True)
+    run(input_dt, session, store_locally=True)
 
 
 if __name__ == "__main__":
