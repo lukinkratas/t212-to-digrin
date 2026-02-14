@@ -1,4 +1,4 @@
-.PHONY: fmt lint lint-fix typechk test test-htmlcov clean-up build update-lambda
+.PHONY: fmt lint lint-fix typechk test test-htmlcov clean-up build update-lambda bak
 
 help:
 	@echo "Available targets:"
@@ -11,6 +11,7 @@ help:
 	@echo "  clean-up         - Clean up - remove htmlcov, __pycache__, pytest mypy and ruff cache dirs"
 	@echo "  build            - Run the build script and create zip for lambda"
 	@echo "  update-lambda    - Build and update lambda function code"
+	@echo "  bak              - Backup S3 bucket into local bak directory"
 	@echo "  help             - Show this help message"
 
 fmt:
@@ -49,3 +50,6 @@ update-lambda:
 	aws lambda update-function-code \
 		--function-name t212-to-digrin \
 		--zip-file fileb://lambda.zip
+
+bak:
+	aws s3 sync s3://t212-to-digrin bak
