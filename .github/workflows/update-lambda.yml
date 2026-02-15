@@ -1,10 +1,11 @@
 name: Update AWS Lambda
 
 on:
-  workflow_run:
-    workflows: ["Test"]
-    types: ["completed"]
-    paths: ["t212_to_digrin/**"]
+  pull_request:
+    types:
+      - close
+    paths:
+      - "t212_to_digrin/**"
 
 permissions:
   contents: read    # This is required to checkout the repository
@@ -12,8 +13,8 @@ permissions:
 
 jobs:
   update-lambda:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
     - name: Checkout
