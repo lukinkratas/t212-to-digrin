@@ -25,3 +25,16 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_put" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.s3_put.arn
 }
+
+resource "aws_iam_role_policy" "ses_send_mail" {
+  name = "SesSendMail${local.policy_suffix}"
+  role = aws_iam_role.gh_update_lambda.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "ses:SendEmail"
+      Resource = aws_ses_email_identity.email.arn
+    }]
+  })
+}
