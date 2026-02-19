@@ -20,7 +20,7 @@ def encode_df(df: pd.DataFrame, **kwargs: Any) -> bytes:
     return bytes.getvalue()
 
 
-def get_func_name(func: Callable[..., Any], args: tuple[Any, ...]) -> str:
+def _get_func_name(func: Callable[..., Any], args: tuple[Any, ...]) -> str:
     """Helper function for function name logging.
 
     Args:
@@ -37,14 +37,14 @@ def get_func_name(func: Callable[..., Any], args: tuple[Any, ...]) -> str:
 
 
 def log_func(log_func: Callable[..., Any] = print) -> Callable[..., Any]:
-    """Decorator factory that accepts a logging function."""
+    """Decorator for logging start and finish of function execution."""
 
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         """Decorator, that wraps the function."""
 
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            func_name = get_func_name(func, args)
+            func_name = _get_func_name(func, args)
 
             log_func(f"{func_name}() was called.")
             result = func(*args, **kwargs)
