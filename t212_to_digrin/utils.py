@@ -48,7 +48,7 @@ def log_func(log_func: Callable[..., Any] = print) -> Callable[..., Any]:
 
             log_func(f"{func_name}() was called.")
             result = func(*args, **kwargs)
-            log_func(f"{func_name} finished.")
+            log_func(f"{func_name}() finished.")
 
             return result
 
