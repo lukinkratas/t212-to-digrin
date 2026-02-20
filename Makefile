@@ -43,8 +43,8 @@ clean-up:
 		*.csv
 
 build:
-	[[ -f t212_to_digrin.zip ]] && rm t212_to_digrin.zip
-	(cd t212_to_digrin && zip -r ../t212_to_digrin.zip . -x **__pycache__)
+	rm -v t212_to_digrin.zip
+	(cd t212_to_digrin && zip -r ../t212_to_digrin.zip . -x \*__pycache__ __main__.py __init__.py)
 
 update-lambda:
 	$(MAKE) build
