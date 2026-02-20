@@ -202,7 +202,7 @@ def upload_to_aws(
         digrin_csv_url = get_presigned_url(
             s3_client, bucket=BUCKET, key=f"digrin/{filename}"
         )
-        logger.info(f"Digrin CSV url: {digrin_csv_url}")
+        logger.info("Digrin CSV url generated.")
         return digrin_csv_url
 
 
