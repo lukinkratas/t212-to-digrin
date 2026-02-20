@@ -75,7 +75,7 @@ def test_create_report(
 def test_upload_to_aws(t212_df: pd.DataFrame, mocker: MockerFixture) -> None:
     mocker.patch("t212_to_digrin.main.upload_file", return_value=None)
     mocker.patch(
-        "t212_to_digrin.main.get_download_url",
+        "t212_to_digrin.main.get_presigned_url",
         return_value="https://t212-to-digrin.s3.amazonaws.com/xxx/YYYY-mm.csv?X-Amz-Algorithm=xxx&X-Amz-Credential=xxx&X-Amz-Date=xxx&X-Amz-Expires=xxx&X-Amz-SignedHeaders=host&X-Amz-Signature=xxx",
     )
 
