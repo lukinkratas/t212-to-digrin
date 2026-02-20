@@ -42,7 +42,7 @@ def get_presigned_url(s3_client: BaseClient, bucket: str, key: str) -> str:
         s3_client.generate_presigned_url,
         "get_object",
         Params={"Bucket": bucket, "Key": key},
-        ExpiresIn=60,  # 1min
+        ExpiresIn=120,  # 2min
     )
 
 
