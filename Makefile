@@ -34,22 +34,23 @@ test-htmlcov:
 
 clean-up:
 	rm -rvf __pycache__ \
-		t212_to_digrin/__pycache__ \
 		.pytest_cache \
 		.mypy_cache \
 		.ruff_cache \
 		.coverage \
 		htmlcov \
-		build \
-		lambda.zip
+		t212_to_digrin.zip \
+		*.csv
 
 build:
-	scripts/build.sh
+	rm -vf t212_to_digrin.zip
+	zip -r t212_to_digrin.zip t212_to_digrin -x \*__pycache__ \*__main__.py
 
 update-lambda:
+	$(MAKE) build
 	aws lambda update-function-code \
 		--function-name t212-to-digrin \
-		--zip-file fileb://lambda.zip
+		--zip-file fileb://t212_to_digrin.zip
 
 bak:
 	aws s3 sync s3://t212-to-digrin bak
