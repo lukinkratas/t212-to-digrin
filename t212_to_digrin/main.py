@@ -205,6 +205,8 @@ def upload_to_aws(
         logger.info("Digrin CSV url generated.")
         return digrin_csv_url
 
+    return None
+
 
 @log_func(logger.info)
 def run(
