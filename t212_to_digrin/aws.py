@@ -48,6 +48,7 @@ def get_presigned_url(s3_client: BaseClient, bucket: str, key: str) -> str:
 
 @log_func(logger.debug)
 def send_email(ses_client: BaseClient, message: dict[str, Any]) -> str:
+    """Send email via SES service."""
     return _request(
         ses_client.send_email,
         Source="lukin.kratas@seznam.cz",  # must be verified
