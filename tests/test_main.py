@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 from pandas.testing import assert_frame_equal
 from pytest_mock import MockerFixture
 
-from t212_to_digrin.main import create_report, transform_df, upload_to_aws
+from t212_to_digrin.main import create_report, transform_and_upload, transform_df
 from t212_to_digrin.utils import encode_df
 
 FIXTURE_PATH = pathlib.Path(__file__).resolve().parent.joinpath("fixtures")
@@ -59,7 +59,7 @@ def test_create_report(
     export: dict[str, int],
     mock_sleep: None,
 ) -> None:
-    mocker.patch("t212_to_digrin.main.get_secret", return_value=secret)
+    mocker.patch("t212_to_digrin.main.sm_get_secret", return_value=secret)
 
     mock_client = mocker.Mock()
     mock_client.export_report.return_value = export["reportId"]
@@ -72,14 +72,14 @@ def test_create_report(
     assert create_report(session, from_dt, to_dt) == export
 
 
-def test_upload_to_aws(t212_df: pd.DataFrame, mocker: MockerFixture) -> None:
-    mocker.patch("t212_to_digrin.main.upload_file", return_value=None)
+def test_transform_and_upload(t212_df: pd.DataFrame, mocker: MockerFixture) -> None:
+    mocker.patch("t212_to_digrin.main.s3_upload_file", return_value=None)
     mocker.patch(
-        "t212_to_digrin.main.get_presigned_url",
+        "t212_to_digrin.main.s3_get_presigned_url",
         return_value="https://t212-to-digrin.s3.amazonaws.com/xxx/YYYY-mm.csv?X-Amz-Algorithm=xxx&X-Amz-Credential=xxx&X-Amz-Date=xxx&X-Amz-Expires=xxx&X-Amz-SignedHeaders=host&X-Amz-Signature=xxx",
     )
 
-    upload_to_aws(
+    transform_and_upload(
         session=mocker.Mock(),
         t212_csv_encoded=encode_df(t212_df),
         filename="YYYY-mm.csv",

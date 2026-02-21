@@ -24,7 +24,8 @@ def _get_ses_client(session: Session) -> BaseClient:
     return session.client("ses")
 
 
-def send_email(session: Session, dt: date | datetime, url: str):
+def send_email(session: Session, dt: date | datetime, url: str) -> None:
+    """Send email via AWS SES."""
     ses_client = _get_ses_client(session)
     message = {
         "Subject": {

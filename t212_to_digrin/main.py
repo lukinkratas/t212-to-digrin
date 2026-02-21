@@ -165,14 +165,14 @@ def download_report(url: str) -> bytes:
 
 
 @log_func(logger.info)
-def transform_and_upload_to_s3(
+def transform_and_upload(
     session: Session,
     t212_csv_encoded: bytes,
     filename: str,
     store_locally: bool = False,
     generate_presigned_url: bool = False,
 ) -> str | None:
-    """Call AWS endpoints to store csvs."""
+    """Upload T212 CSV to AWS S3, transform to digrin form and upload it to AWS S3."""
     s3_client = _get_s3_client(session)
 
     s3_upload_file(
@@ -222,7 +222,7 @@ def run(
     report = create_report(session, from_dt, to_dt)
     download_link = report["downloadLink"]
 
-    return transform_and_upload_to_s3(
+    return transform_and_upload(
         session,
         t212_csv_encoded=download_report(download_link),
         filename=f"{input_dt.strftime('%Y-%m')}.csv",
