@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import date
+from datetime import date, datetime
 from functools import lru_cache
 from typing import Any
 
@@ -8,7 +8,7 @@ from boto3 import Session
 from botocore.client import BaseClient
 from dateutil.relativedelta import relativedelta
 
-from .aws import send_email
+from .aws import ses_send_email
 from .logging_config import configure_logging
 from .main import run
 
@@ -24,10 +24,8 @@ def _get_ses_client(session: Session) -> BaseClient:
     return session.client("ses")
 
 
-def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
-    """Logic for lambda entrypoint."""
-    prev_month = date.today() - relativedelta(months=1)  # day does not matter
-    digrin_csv_url = run(prev_month, session, generate_presigned_url=True)
+def send_email(session: Session, dt: date | datetime, url: str) -> None:
+    """Send email via AWS SES."""
     ses_client = _get_ses_client(session)
     message = {
         "Subject": {
@@ -42,8 +40,8 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
                     "<p>Wazzuuup</p>"
                     "<p></p>"
                     "<p>"
-                    f"{prev_month.strftime('%b %Y')} CSV can be downloaded "
-                    f"<a href='{digrin_csv_url}'>here</a>"
+                    f"{dt.strftime('%b %Y')} CSV can be downloaded "
+                    f"<a href='{url}'>here</a>"
                     "."
                     "</p>"
                     "</body>"
@@ -53,5 +51,12 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             }
         },
     }
-    send_email(ses_client, message)
+    ses_send_email(ses_client, message)
+
+
+def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
+    """Logic for lambda entrypoint."""
+    prev_month = date.today() - relativedelta(months=1)  # day does not matter
+    digrin_csv_url = run(prev_month, session, generate_presigned_url=True)
+    send_email(session, prev_month, digrin_csv_url)
     return {"statusCode": 200, "body": json.dumps("Success!")}
