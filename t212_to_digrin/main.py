@@ -12,7 +12,7 @@ from boto3 import Session
 from botocore.client import BaseClient
 from dateutil.relativedelta import relativedelta
 
-from .aws import get_presigned_url, get_secret, upload_file
+from .aws import s3_get_presigned_url, s3_upload_file, sm_get_secret
 from .t212 import Client as T212Client
 from .utils import decode_csv, encode_df, log_func
 
@@ -37,7 +37,7 @@ def _get_s3_client(session: Session) -> BaseClient:
 @lru_cache
 def _get_t212_client(secrets_client: BaseClient) -> T212Client:
     """Lazy init t212.Client."""
-    secret = get_secret(secrets_client, "t212-to-digrin")
+    secret = sm_get_secret(secrets_client, "t212-to-digrin")
     return T212Client(
         api_key_id=secret["T212_API_KEY_ID"],
         secret_key=secret["T212_SECRET_KEY"],
@@ -165,7 +165,7 @@ def download_report(url: str) -> bytes:
 
 
 @log_func(logger.info)
-def upload_to_aws(
+def transform_and_upload_to_s3(
     session: Session,
     t212_csv_encoded: bytes,
     filename: str,
@@ -175,7 +175,7 @@ def upload_to_aws(
     """Call AWS endpoints to store csvs."""
     s3_client = _get_s3_client(session)
 
-    upload_file(
+    s3_upload_file(
         s3_client,
         fileobj=BytesIO(t212_csv_encoded),
         bucket=BUCKET,
@@ -186,7 +186,7 @@ def upload_to_aws(
     t212_df = decode_csv(t212_csv_encoded)
     digrin_df = transform_df(t212_df)
     digrin_csv_encoded = encode_df(digrin_df)
-    upload_file(
+    s3_upload_file(
         s3_client,
         fileobj=BytesIO(digrin_csv_encoded),
         bucket=BUCKET,
@@ -199,7 +199,7 @@ def upload_to_aws(
         logger.info("Digrin CSV stored locally.")
 
     if generate_presigned_url:
-        digrin_csv_url = get_presigned_url(
+        digrin_csv_url = s3_get_presigned_url(
             s3_client, bucket=BUCKET, key=f"digrin/{filename}"
         )
         logger.info("Digrin CSV url generated.")
@@ -222,7 +222,7 @@ def run(
     report = create_report(session, from_dt, to_dt)
     download_link = report["downloadLink"]
 
-    return upload_to_aws(
+    return transform_and_upload_to_s3(
         session,
         t212_csv_encoded=download_report(download_link),
         filename=f"{input_dt.strftime('%Y-%m')}.csv",

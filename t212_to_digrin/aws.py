@@ -23,20 +23,22 @@ def _request(func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
 
 
 @log_func(logger.debug)
-def get_secret(secrets_client: BaseClient, secret_name: str) -> str:
+def sm_get_secret(secrets_client: BaseClient, secret_name: str) -> str:
     """Fetch secret key-value pairs from Secrets Manager Service."""
     response = _request(secrets_client.get_secret_value, SecretId=secret_name)
     return json.loads(response["SecretString"])
 
 
 @log_func(logger.debug)
-def upload_file(s3_client: BaseClient, fileobj: bytes, bucket: str, key: str) -> None:
+def s3_upload_file(
+    s3_client: BaseClient, fileobj: bytes, bucket: str, key: str
+) -> None:
     """Upload file bytes to S3 service."""
     _request(s3_client.upload_fileobj, Fileobj=fileobj, Bucket=bucket, Key=key)
 
 
 @log_func(logger.debug)
-def get_presigned_url(s3_client: BaseClient, bucket: str, key: str) -> str:
+def s3_get_presigned_url(s3_client: BaseClient, bucket: str, key: str) -> str:
     """Generate presigned url for file stored in S3 service."""
     return _request(
         s3_client.generate_presigned_url,
@@ -47,7 +49,7 @@ def get_presigned_url(s3_client: BaseClient, bucket: str, key: str) -> str:
 
 
 @log_func(logger.debug)
-def send_email(ses_client: BaseClient, message: dict[str, Any]) -> str:
+def ses_send_email(ses_client: BaseClient, message: dict[str, Any]) -> str:
     """Send email via SES service."""
     return _request(
         ses_client.send_email,
