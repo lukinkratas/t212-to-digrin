@@ -1,9 +1,9 @@
 name: Deploy AWS Infra
 
 on:
-  pull_request:
-    types:
-      - close
+  push:
+    branches:
+      - main
     paths:
       - "terraform/**"
 
@@ -13,7 +13,6 @@ permissions:
 
 jobs:
   deploy-tf:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
