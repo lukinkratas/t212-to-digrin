@@ -26,6 +26,19 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_put" {
   policy_arn = aws_iam_policy.s3_put.arn
 }
 
+resource "aws_iam_role_policy" "s3_get" {
+  name = "S3Read${local.policy_suffix}"
+  role = aws_iam_user.lambda.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "s3:GetObject"
+      Resource = "${aws_s3_bucket.bucket.arn}/*"
+    }]
+  })
+}
+
 resource "aws_iam_role_policy" "ses_send_mail" {
   name = "SesSendMail${local.policy_suffix}"
   role = aws_iam_role.lambda.id
