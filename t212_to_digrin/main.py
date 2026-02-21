@@ -78,8 +78,8 @@ def create_report(
         sys.exit(1)
 
     # optimized wait time for report to be created
-    logger.debug("Waiting 10s between API calls...")
-    time.sleep(10)
+    logger.debug("Waiting 15s between API calls...")
+    time.sleep(15)
 
     for idx in range(1, NRETRIES + 1):
         logger.debug(msg.format(idx=idx, total=NRETRIES, status="started"))
