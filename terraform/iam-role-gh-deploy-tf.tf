@@ -172,3 +172,16 @@ resource "aws_iam_role_policy" "scheduler" {
     ]
   })
 }
+
+resource "aws_iam_role_policy" "ses" {
+  name = "Ses${local.policy_suffix}"
+  role = aws_iam_role.gh_deploy_tf.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "ses:*"
+      Resource = aws_ses_email_identity.email.arn
+    }]
+  })
+}
