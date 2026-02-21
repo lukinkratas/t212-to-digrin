@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_put" {
 
 resource "aws_iam_role_policy" "s3_get" {
   name = "S3Read${local.policy_suffix}"
-  role = aws_iam_user.lambda.id
+  role = aws_iam_role.lambda.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
