@@ -40,7 +40,7 @@ def send_email(session: Session, dt: date | datetime, url: str) -> None:
                     "<p>Wazzuuup</p>"
                     "<p></p>"
                     "<p>"
-                    f"{dt.strftime('%b %Y')} CSV can be downloaded "
+                    f"{dt.strftime('%b %Y')} CSV can be downloaded from "
                     f"<a href='{url}'>here</a>"
                     "."
                     "</p>"
