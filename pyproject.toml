@@ -35,6 +35,7 @@ extend-select = [
     "NPY",  # numpy
     "D"     # pydocstyle
 ]
+
 ignore = [
     "D100", # missing docstring in public module
     "D104", # missing docstring in public package
@@ -42,9 +43,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"api/schemas/*" = ["D101"] # missing docstring in public class
 "tests/*" = [
-    "D102", # missing docstring in public method
     "D103", # missing docstring in public function
 ]
 
