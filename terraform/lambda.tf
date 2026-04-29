@@ -8,6 +8,7 @@ resource "aws_lambda_function" "lambda" {
   memory_size   = 128
   package_type  = "Zip"
   filename      = "../t212_to_digrin.zip"
-  code_sha256   = "../t212_to_digrin.zip"
+  code_sha256   = filebase64sha256("../t212_to_digrin.zip")
   tags          = aws_servicecatalogappregistry_application.app.application_tag
+  depends_on    = [aws_cloudwatch_log_group.lambda]
 }
