@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "s3_put" {
-  name        = "S3Write${local.policy_suffix}"
+  name        = "${local.project_name}-s3-write"
   description = "PutObject to S3 bucket t212-to-digrin"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -15,7 +15,7 @@ resource "aws_iam_policy" "s3_put" {
 }
 
 resource "aws_iam_policy" "secrets_manager" {
-  name        = "SecretsManager${local.policy_suffix}"
+  name        = "${local.project_name}-secrets-manager-read"
   description = "GetSecretValue from Secrets Manager secret t212-to-digrin"
   policy = jsonencode({
     Version = "2012-10-17"

@@ -1,5 +1,6 @@
 resource "aws_iam_role" "lambda" {
   name = "${local.project_name}-lambda"
+  path = "/${local.project_name}/"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -27,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_put" {
 }
 
 resource "aws_iam_role_policy" "s3_get" {
-  name = "S3Read${local.policy_suffix}"
+  name = "s3-read"
   role = aws_iam_role.lambda.id
   policy = jsonencode({
     Version = "2012-10-17"
@@ -40,7 +41,7 @@ resource "aws_iam_role_policy" "s3_get" {
 }
 
 resource "aws_iam_role_policy" "ses_send_mail" {
-  name = "SesSendMail${local.policy_suffix}"
+  name = "ses-sendmail"
   role = aws_iam_role.lambda.id
   policy = jsonencode({
     Version = "2012-10-17"

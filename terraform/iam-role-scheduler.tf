@@ -1,5 +1,6 @@
 resource "aws_iam_role" "scheduler" {
   name = "${local.project_name}-scheduler"
+  path = "/${local.project_name}/"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -12,7 +13,7 @@ resource "aws_iam_role" "scheduler" {
 }
 
 resource "aws_iam_role_policy" "lambda_invoke" {
-  name = "LambdaInvoke${local.policy_suffix}"
+  name = "lambda-invoke"
   role = aws_iam_role.scheduler.id
   policy = jsonencode({
     Version = "2012-10-17"
