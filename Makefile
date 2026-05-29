@@ -1,10 +1,11 @@
-.PHONY: fmt lint lint-fix typechk test test-htmlcov clean-up build update-lambda bak
+.PHONY: fmt fmtchk lint lintchk typechk test test-htmlcov clean-up build update-lambda bak
 
 help:
 	@echo "Available targets:"
-	@echo "  fmt              - Format the code using Ruff"
-	@echo "  lint             - Check linting of the code using Ruff"
-	@echo "  lint-fix         - Check and fix linting if the code using Ruff"
+	@echo "  fmt              - Format the code using Ruff and Terraform"
+	@echo "  fmtchk           - Check formatting using Ruff and Terraform"
+	@echo "  lint             - Lint the code using Ruff and sqlfluff"
+	@echo "  lintchk          - Check linting using Ruff and sqlfluff"
 	@echo "  typechk          - Type check the code using mypy"
 	@echo "  test             - Run unit tests"
 	@echo "  test-htmlcov     - Run unit tests with html coverage report"
@@ -16,12 +17,17 @@ help:
 
 fmt:
 	uv run --dev ruff format
+	terraform fmt terraform/
+
+fmtchk:
+	uv run --dev ruff format --check
+	terraform fmt -check terraform/
 
 lint:
-	uv run --dev ruff check
-
-lint-fix:
 	uv run --dev ruff check --fix
+
+lintchk:
+	uv run --dev ruff check --check
 
 typechk:
 	uv run --dev mypy .
