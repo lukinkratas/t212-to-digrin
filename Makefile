@@ -27,7 +27,7 @@ lint:
 	uv run --dev ruff check --fix
 
 lintchk:
-	uv run --dev ruff check --check
+	uv run --dev ruff check
 
 typechk:
 	uv run --dev mypy .

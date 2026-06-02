@@ -4,7 +4,7 @@ resource "aws_lambda_function" "lambda" {
   handler       = "t212_to_digrin.lambda_function.lambda_handler"
   role          = aws_iam_role.lambda.arn
   layers        = ["arn:aws:lambda:eu-central-1:336392948345:layer:AWSSDKPandas-Python314:2"]
-  timeout       = 301 # 5min
+  timeout       = 300 # 5min
   memory_size   = 128
   package_type  = "Zip"
   filename      = "../t212_to_digrin.zip"
