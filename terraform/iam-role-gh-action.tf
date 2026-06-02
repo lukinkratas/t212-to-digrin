@@ -120,12 +120,6 @@ resource "aws_iam_role_policy" "s3" {
           "s3:PutBucketVersioning",
           "s3:GetBucketTagging",
           "s3:PutBucketTagging",
-          "s3:GetBucketPublicAccessBlock",
-          "s3:PutBucketPublicAccessBlock",
-          "s3:GetEncryptionConfiguration",
-          "s3:PutEncryptionConfiguration",
-          "s3:GetLifecycleConfiguration",
-          "s3:PutLifecycleConfiguration",
           "s3:ListBucket",
         ]
         Resource = aws_s3_bucket.bucket.arn
@@ -309,7 +303,7 @@ resource "aws_iam_role_policy" "iam_scheduler_role" {
       {
         Effect   = "Allow",
         Action   = "iam:CreateRole"
-        Resource = "arn:aws:iam::*:user/${local.project_name}/*"
+        Resource = "arn:aws:iam::*:role/${local.project_name}/*"
       },
       {
         Effect = "Allow"
@@ -344,7 +338,7 @@ resource "aws_iam_role_policy" "iam_lambda_role" {
       {
         Effect   = "Allow",
         Action   = "iam:CreateRole"
-        Resource = "arn:aws:iam::*:user/${local.project_name}/*"
+        Resource = "arn:aws:iam::*:role/${local.project_name}/*"
       },
       {
         Effect = "Allow"
