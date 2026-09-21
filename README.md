@@ -24,8 +24,8 @@ Can be run from CLI or AWS lambda.
 
 ### CLI Run
 
-**Requirements:** `aws configure --profile t212-to-digrin-cli`
+**Requirements:** `aws login` or `aws configure --profile t212-to-digrin-cli`
 
 ```bash
-uv run python -m t212_to_digrin
+uv run main.py
 ```

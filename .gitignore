@@ -7,6 +7,21 @@ __pycache__
 .env
 .coverage
 *.zip
-.terraform
 bak
 *.csv
+exports/*
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+*.tfvars.json
+override.tf
+override_*.tf
+.terraformrc
+terraform.rc
+
+# but keep the lockfile
+!.terraform.lock.hcl

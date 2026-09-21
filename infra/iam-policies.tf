@@ -1,0 +1,16 @@
+resource "aws_iam_policy" "s3_put" {
+  name        = "${local.project_name}-s3-write"
+  description = "PutObject to S3 bucket t212-to-digrin"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.bucket.arn}/*"
+      }
+    ]
+  })
+  tags = aws_servicecatalogappregistry_application.app.application_tag
+}
+

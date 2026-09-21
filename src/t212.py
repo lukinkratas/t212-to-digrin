@@ -21,8 +21,8 @@ class Client(object):
     @log_func(logger.debug)
     def export_report(
         self,
-        from_dt: str,
-        to_dt: str,
+        from_str: str,
+        to_str: str,
         include_dividends: bool = True,
         include_interest: bool = True,
         include_orders: bool = True,
@@ -37,8 +37,8 @@ class Client(object):
                 "includeOrders": include_orders,
                 "includeTransactions": include_transactions,
             },
-            "timeFrom": from_dt,
-            "timeTo": to_dt,
+            "timeFrom": from_str,
+            "timeTo": to_str,
         }
         headers = {"Content-Type": "application/json"}
         auth = (self.api_key_id, self.secret_key)
@@ -55,7 +55,7 @@ class Client(object):
 
     @log_func(logger.debug)
     def list_exports(self) -> list[dict[str, Any]] | None:
-        """Fetch list of reports."""
+        """Fetch list of exports."""
         url = f"{self.BASE_URL}/history/exports"
         auth = (self.api_key_id, self.secret_key)
 

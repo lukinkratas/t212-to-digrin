@@ -9,7 +9,3 @@ resource "aws_iam_user_policy_attachment" "cli_s3_put" {
   policy_arn = aws_iam_policy.s3_put.arn
 }
 
-resource "aws_iam_user_policy_attachment" "cli_secrets_manager" {
-  user       = aws_iam_user.cli.name
-  policy_arn = aws_iam_policy.secrets_manager.arn
-}
