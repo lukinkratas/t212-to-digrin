@@ -195,4 +195,3 @@ resource "aws_iam_role_policy" "iam_cli_user" {
     ]
   })
 }
-

@@ -57,12 +57,12 @@ def request_report(year: int, month: int) -> str:
     to_dt = date(year, month + 1, 1) - relativedelta(days=-1)
 
     from_str = f"{from_dt.strftime('%Y-%m-%d')}T00:00:00.000Z"
-    to_str = f"{to_dt.strfitme('%Y-%m-%d')}T23:59:59.999Z"
+    to_str = f"{to_dt.strftime('%Y-%m-%d')}T23:59:59.999Z"
 
     report_id = t212_client.export_report(from_str, to_str)
 
     if report_id is None:
-        raise logger.error("report_id missing - report not created.")
+        logger.error("report_id missing - report not created.")
 
     return report_id
 

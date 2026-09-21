@@ -3,44 +3,29 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
+      - id: check-added-large-files
       - id: trailing-whitespace
       - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-added-large-files
+      - id: check-toml
+      - id: detect-aws-credentials
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.11
+  - repo: local
     hooks:
-      - id: ruff-check
-        args: [ --fix ]
-      - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
-    hooks:
-      - id: mypy
-        args: [--config-file=./pyproject.toml]
+      - id: fmt
+        name: fmt
+        language: system
+        entry: make fmt
+        pass_filenames: false # Do not pass filenames = runs on all files and not only modified ones
 
-  # - repo: local
-  #   hooks:
+      - id: lint
+        name: lint
+        language: system
+        entry: make lint
+        pass_filenames: false
 
-  #     - id: ruff-format
-  #       name: ruff format
-  #       language: system
-  #       entry: make fmt
-  #       types: [python]
-  #       require_serial: true
-
-  #     - id: ruff-lint-fix
-  #       name: ruff lint fix
-  #       language: system
-  #       entry: make lint-fix
-  #       types: [python]
-  #       require_serial: true
-
-  #     - id: mypy-type-check
-  #       name: mypy type check
-  #       language: system
-  #       entry: make typechk
-  #       types: [python]
-  #       require_serial: true
+      - id: typecheck
+        name: typechk
+        language: system
+        entry: make typechk
+        pass_filenames: false

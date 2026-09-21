@@ -13,11 +13,11 @@ help:
 
 fmt:
 	uv run --dev ruff format
-	terraform fmt terraform/
+	terraform fmt infra/
 
 fmtchk:
 	uv run --dev ruff format --check
-	terraform fmt -check terraform/
+	terraform fmt -check infra/
 
 lint:
 	uv run --dev ruff check --fix

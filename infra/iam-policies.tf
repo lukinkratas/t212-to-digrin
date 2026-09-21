@@ -13,4 +13,3 @@ resource "aws_iam_policy" "s3_put" {
   })
   tags = aws_servicecatalogappregistry_application.app.application_tag
 }
-
