@@ -3,6 +3,7 @@ import os
 import time
 from datetime import date
 from io import BytesIO
+from pathlib import Path
 from typing import Any
 
 import boto3
@@ -10,7 +11,6 @@ import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
-from Pathlib import Path
 
 from src.aws import s3_upload_file
 from src.t212 import Client as T212Client
@@ -20,6 +20,7 @@ load_dotenv()
 
 logging.basicConfig(format="%(asctime)s | %(levelname)-8s | %(name)-19s | %(message)s")
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 BUCKET = "t212-to-digrin"
 NRETRIES = 5
@@ -32,7 +33,12 @@ t212_client = T212Client(
     api_key_id=os.environ["T212_API_KEY"], secret_key=os.environ["T212_SECRET_KEY"]
 )
 
-s3_client = boto3.client("s3", aws_access_key_id, aws_secret_access_key)
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
+    region_name="eu-central-1",
+)
 
 
 @log_func(logger.info)
@@ -181,7 +187,27 @@ def main() -> None:
 
     t212_df = decode_csv(t212_csv_encoded)
     digrin_df = transform_df(t212_df)
-    print("digrin DF:", digrin_df)
+    print("digrin DF:")
+    print(
+        digrin_df[
+            :,
+            [
+                "Action",
+                "Time (UTC)",
+                "ISIN",
+                "Ticker",
+                "Name",
+                "ID",
+                "Np. of shares",
+                "Current (Price / share)",
+                "Exchange rate",
+                "Result",
+                "Currency (Result)",
+                "Total",
+                "Currency (Total)",
+            ],
+        ]
+    )
     digrin_csv_encoded = encode_df(digrin_df)
 
     if aws_access_key_id and aws_secret_access_key:
