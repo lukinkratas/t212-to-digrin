@@ -33,7 +33,8 @@ clean-up:
 		.pytest_cache \
 		.mypy_cache \
 		.ruff_cache \
-		*.csv
+		*.csv \
+		exports/*
 
 bak:
 	aws s3 sync s3://t212-to-digrin bak

@@ -175,7 +175,7 @@ def main() -> None:
     report = poll_report(report_id)
     download_link = report["downloadLink"]
     t212_csv_encoded = download_report(download_link)
-    filename = f"{year}-{month}_{report_id}.csv"
+    filename = f"{year}-{month:02d}_{report_id}.csv"
 
     s3_upload_file(
         s3_client,
@@ -190,22 +190,18 @@ def main() -> None:
     print("digrin DF:")
     print(
         digrin_df[
-            :,
             [
                 "Action",
                 "Time (UTC)",
-                "ISIN",
                 "Ticker",
-                "Name",
-                "ID",
-                "Np. of shares",
-                "Current (Price / share)",
-                "Exchange rate",
+                "No. of shares",
+                "Price / share",
+                "Currency (Price / share)",
                 "Result",
                 "Currency (Result)",
                 "Total",
                 "Currency (Total)",
-            ],
+            ]
         ]
     )
     digrin_csv_encoded = encode_df(digrin_df)
