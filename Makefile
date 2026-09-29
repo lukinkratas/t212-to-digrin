@@ -37,4 +37,4 @@ clean-up:
 		exports/*
 
 deploy:
-	(cd infra && terraform validate && terraform plan && terraform apply)
+	(cd infra/ && terraform validate && terraform plan && terraform apply)
