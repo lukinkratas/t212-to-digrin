@@ -1,4 +1,4 @@
-.PHONY: fmt fmtchk lint lintchk typechk clean-up bak
+.PHONY: fmt fmtchk lint lintchk typechk clean-up deploy
 
 help:
 	@echo "Available targets:"
@@ -8,7 +8,7 @@ help:
 	@echo "  lintchk          - Check linting using Ruff and sqlfluff"
 	@echo "  typechk          - Type check the code using mypy"
 	@echo "  clean-up         - Clean up - remove htmlcov, __pycache__, pytest mypy and ruff cache dirs"
-	@echo "  bak              - Backup S3 bucket into local bak directory"
+	@echo "  deploy           - deploy infra based on terraform config"
 	@echo "  help             - Show this help message"
 
 fmt:
@@ -36,5 +36,5 @@ clean-up:
 		*.csv \
 		exports/*
 
-bak:
-	aws s3 sync s3://t212-to-digrin bak
+deploy:
+	(cd infra && terraform validate && terraform plan && terraform apply)
