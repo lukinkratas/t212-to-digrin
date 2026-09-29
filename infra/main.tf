@@ -1,14 +1,15 @@
 terraform {
-  required_version = ">= 1.10" # use_lockfile needs 1.10+
-  required_providers {
-    aws = { source = "hashicorp/aws", version = "~> 6.31" }
-  }
   backend "s3" {
     bucket       = "terraform-state-8f45b0ac"
     key          = "t212-to-digrin/terraform.tfstate"
     region       = "eu-central-1"
     use_lockfile = true
     encrypt      = true
+  }
+
+  required_version = ">= 1.10" # use_lockfile needs 1.10+
+  required_providers {
+    aws = { source = "hashicorp/aws", version = "~> 6.31" }
   }
 }
 
